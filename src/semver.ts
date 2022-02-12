@@ -1,14 +1,11 @@
-// Find the latest minor version in the tags.
-export const findLatestMinor = (tags: string[], major: number): number => {
-  const minors = tags
-    .filter((tag) => tag.startsWith(`v${major}.`))
-    .map((tag) => {
-      const [, minor] = tag.split('.')
-      const minorNumber = parseInt(minor)
-      if (!Number.isSafeInteger(minorNumber)) {
-        return 0
-      }
-      return minorNumber
-    })
-  return Math.max(0, ...minors)
+export const computeNextTag = (currentTag: string | undefined, majorTag: string): string => {
+  if (currentTag === undefined) {
+    return `${majorTag}.1.0`
+  }
+  const [, minor] = currentTag.split('.')
+  let minorNumber = parseInt(minor)
+  if (!Number.isSafeInteger(minorNumber)) {
+    minorNumber = 0
+  }
+  return `${majorTag}.${minorNumber + 1}.0`
 }
