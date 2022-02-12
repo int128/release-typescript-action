@@ -3,7 +3,9 @@ import { run } from './run'
 
 const main = async (): Promise<void> => {
   await run({
-    name: core.getInput('name', { required: true }),
+    majorVersion: parseInt(core.getInput('major-version', { required: true })),
+    token: core.getInput('token', { required: true }),
+    dryRun: core.getBooleanInput('dry-run', { required: true }),
   })
 }
 

@@ -41,4 +41,5 @@ jobs:
       - name: e2e-test
         uses: ./
         with:
-          name: foo
+          major-version: 0
+          dry-run: ${{ github.event_name == 'pull_request' }}
