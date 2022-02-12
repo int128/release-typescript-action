@@ -5,6 +5,7 @@ inputs:
   major-version:
     description: major version
     required: true
+    default: '1'
   token:
     description: GitHub token
     required: true
