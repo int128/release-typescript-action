@@ -3,7 +3,7 @@ import * as exec from '@actions/exec'
 import * as github from '@actions/github'
 
 export const updateCurrentTag = async () => {
-  const currentTag = github.context.ref.substring('tags/'.length)
+  const currentTag = github.context.ref.substring('refs/tags/'.length)
   core.info(`Current tag is ${currentTag}`)
   if (!currentTag.startsWith('v')) {
     throw Error(`Tag name should start with v but was ${currentTag}`)
