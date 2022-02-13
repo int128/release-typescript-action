@@ -28,7 +28,7 @@ export const createNextMinorRelease = async (inputs: Inputs) => {
   await exec.exec('git', ['tag', '-f', majorTag])
 
   if (currentTag !== undefined) {
-    const code = await exec.exec('git', ['diff', '--exit-code', currentTag, nextTag, '--', 'dist'], {
+    const code = await exec.exec('git', ['diff', '--exit-code', currentTag, nextTag, '--', 'dist', 'action.yaml'], {
       ignoreReturnCode: true,
     })
     if (code === 0) {
