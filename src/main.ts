@@ -5,7 +5,6 @@ const main = async (): Promise<void> => {
   await run({
     majorVersion: parseInt(core.getInput('major-version', { required: true })),
     token: core.getInput('token', { required: true }),
-    dryRun: core.getBooleanInput('dry-run', { required: true }),
   })
 }
 

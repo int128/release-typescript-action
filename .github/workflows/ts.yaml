@@ -45,4 +45,3 @@ jobs:
         uses: ./
         with:
           major-version: 0
-          dry-run: ${{ github.event_name == 'pull_request' }}
