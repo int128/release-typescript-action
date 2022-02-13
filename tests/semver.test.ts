@@ -5,9 +5,9 @@ test('a tag is given', () => {
 })
 
 test('undefined is given', () => {
-  expect(computeNextTag(undefined, 'v1')).toBe('v1.1.0')
+  expect(computeNextTag(undefined, 'v1')).toBe('v1.0.0')
 })
 
 test('invalid tag is given', () => {
-  expect(computeNextTag('v1.x.y', 'v1')).toBe('v1.1.0')
+  expect(computeNextTag('v1.x.y', 'v1')).toBe('v1.0.0')
 })
