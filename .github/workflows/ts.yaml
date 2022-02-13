@@ -39,5 +39,3 @@ jobs:
 
       - name: e2e-test
         uses: ./
-        with:
-          major-version: 0
