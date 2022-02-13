@@ -6,14 +6,14 @@ import { updateCurrentTag } from './update'
 type Inputs = {
   majorVersion: number
   token: string
-  dryRun: boolean
 }
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  if (github.context.ref.startsWith('tags/')) {
+  if (github.context.ref.startsWith('refs/tags/')) {
     core.info('Updating the current tag if generated files are different')
-    return updateCurrentTag(inputs)
+    return updateCurrentTag()
   }
+
   core.info('Creating the next release')
   return createNextMinorRelease(inputs)
 }

@@ -2,11 +2,7 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
 
-type Inputs = {
-  dryRun: boolean
-}
-
-export const updateCurrentTag = async (inputs: Inputs) => {
+export const updateCurrentTag = async () => {
   const currentTag = github.context.ref.substring('tags/'.length)
   core.info(`Current tag is ${currentTag}`)
   if (!currentTag.startsWith('v')) {
@@ -26,11 +22,6 @@ export const updateCurrentTag = async (inputs: Inputs) => {
   await exec.exec('git', ['config', 'user.name', 'github-actions'])
   await exec.exec('git', ['config', 'user.email', 'github-actions@github.com'])
   await exec.exec('git', ['commit', '-m', `Release ${currentTag}`])
-  if (inputs.dryRun) {
-    core.info(`Exit due to dry-run`)
-    return
-  }
-
   await exec.exec('git', ['tag', '-f', currentTag])
   await exec.exec('git', ['tag', '-f', majorTag])
   await exec.exec('git', ['push', 'origin', '-f', currentTag, majorTag])

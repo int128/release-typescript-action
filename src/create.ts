@@ -6,7 +6,6 @@ import { computeNextTag } from './semver'
 type Inputs = {
   majorVersion: number
   token: string
-  dryRun: boolean
 }
 
 export const createNextMinorRelease = async (inputs: Inputs) => {
@@ -37,8 +36,8 @@ export const createNextMinorRelease = async (inputs: Inputs) => {
       return
     }
   }
-  if (inputs.dryRun) {
-    core.info(`Exit due to dry-run`)
+  if (github.context.eventName === 'pull_request') {
+    core.warning(`Ignore pull_request event`)
     return
   }
   await exec.exec('git', ['push', 'origin', '-f', nextTag, majorTag])
