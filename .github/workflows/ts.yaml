@@ -9,6 +9,8 @@ on:
       - '*.json'
       - action.yaml
       - .github/workflows/ts.yaml
+    tags:
+      - v*
   pull_request:
     branches: [main]
     paths:
@@ -17,6 +19,7 @@ on:
       - '*.json'
       - action.yaml
       - .github/workflows/ts.yaml
+  workflow_dispatch:
 
 jobs:
   ts:
