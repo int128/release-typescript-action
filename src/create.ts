@@ -9,8 +9,6 @@ type Inputs = {
 }
 
 export const createNextMinorRelease = async (inputs: Inputs) => {
-  const octokit = github.getOctokit(inputs.token)
-
   const majorTag = `v${inputs.majorVersion}`
   core.info(`Major tag is ${majorTag}`)
   const currentTag = await findCurrentTag(majorTag)
@@ -28,6 +26,7 @@ export const createNextMinorRelease = async (inputs: Inputs) => {
   await exec.exec('git', ['tag', '-f', majorTag])
 
   if (currentTag !== undefined) {
+    core.info('Checking if the gerenated files are changed')
     const code = await exec.exec(
       'git',
       [
@@ -53,12 +52,13 @@ export const createNextMinorRelease = async (inputs: Inputs) => {
     }
   }
   if (github.context.eventName === 'pull_request') {
-    core.warning(`Ignore pull_request event`)
+    core.warning(`Next release is ${nextTag} but do nothing on pull request`)
     return
   }
   await exec.exec('git', ['push', 'origin', '-f', nextTag, majorTag])
 
   core.info(`Creating a release for tag ${nextTag}`)
+  const octokit = github.getOctokit(inputs.token)
   const { data: releaseNote } = await octokit.rest.repos.generateReleaseNotes({
     ...github.context.repo,
     tag_name: nextTag,
