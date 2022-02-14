@@ -88,7 +88,21 @@ When you push a tag, this action will add a commit with `dist` directory to the 
 This action ignores any pull request event.
 
 
-## Inputs
+## Specification
+
+This action assumes the following layout:
+
+- For polyrepo
+  - `.gitignore` contains `/dist`
+  - Generated files are under `dist`
+  - Action definition is at `action.yaml`
+- For monorepo
+  - `.gitignore` contains `dist/`
+  - Generated files are under `*/dist`
+  - Action definitions are at `*/action.yaml`
+
+
+### Inputs
 
 | Name | Default | Description
 |------|----------|------------

@@ -11,9 +11,8 @@ export const updateCurrentTag = async () => {
   const [majorTag] = currentTag.split('.')
   core.info(`Major tag is ${majorTag}`)
 
-  await exec.exec('sed', ['-i', '-e', 's|^/dist.*||g', '.gitignore'])
-  await exec.exec('git', ['add', '.gitignore'])
-  await exec.exec('git', ['add', 'dist'])
+  await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])
+  await exec.exec('git', ['add', '.'])
   if ((await gitStatus()) === '') {
     core.info(`Nothing to commit`)
     return
