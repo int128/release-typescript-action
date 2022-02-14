@@ -18,9 +18,9 @@ export const createNextMinorRelease = async (inputs: Inputs) => {
   const nextTag = computeNextTag(currentTag, majorTag)
   core.info(`Next tag is ${nextTag}`)
 
-  await exec.exec('sed', ['-i', '-e', 's|^/dist.*||g', '.gitignore'])
-  await exec.exec('git', ['add', '.gitignore'])
-  await exec.exec('git', ['add', 'dist'])
+  await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])
+  await exec.exec('git', ['add', '.'])
+  await exec.exec('git', ['status'])
   await exec.exec('git', ['config', 'user.name', 'github-actions'])
   await exec.exec('git', ['config', 'user.email', 'github-actions@github.com'])
   await exec.exec('git', ['commit', '-m', `Release ${nextTag}`])
@@ -28,9 +28,25 @@ export const createNextMinorRelease = async (inputs: Inputs) => {
   await exec.exec('git', ['tag', '-f', majorTag])
 
   if (currentTag !== undefined) {
-    const code = await exec.exec('git', ['diff', '--exit-code', currentTag, nextTag, '--', 'dist', 'action.yaml'], {
-      ignoreReturnCode: true,
-    })
+    const code = await exec.exec(
+      'git',
+      [
+        'diff',
+        '--exit-code',
+        currentTag,
+        nextTag,
+        '--',
+        // for polyrepo
+        'dist',
+        'action.yaml',
+        // for monorepo
+        '*/dist',
+        '*/action.yaml',
+      ],
+      {
+        ignoreReturnCode: true,
+      }
+    )
     if (code === 0) {
       core.info('Nothing to release')
       return
