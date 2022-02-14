@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
 
-export const updateCurrentTag = async () => {
+export const followUpCurrentTag = async () => {
   const currentTag = github.context.ref.substring('refs/tags/'.length)
   core.info(`Current tag is ${currentTag}`)
   if (!currentTag.startsWith('v')) {
@@ -14,7 +14,7 @@ export const updateCurrentTag = async () => {
   await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])
   await exec.exec('git', ['add', '.'])
   if ((await gitStatus()) === '') {
-    core.info(`Nothing to commit`)
+    core.info(`Current tag is up-to-date`)
     return
   }
 
