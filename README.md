@@ -1,6 +1,24 @@
 # release-typescript-action [![ts](https://github.com/int128/release-typescript-action/actions/workflows/ts.yaml/badge.svg)](https://github.com/int128/release-typescript-action/actions/workflows/ts.yaml)
 
-This is an action to automate the release of a TypeScript Action.
+This is an action to automate the release of an action written in TypeScript.
+
+
+## Idea
+
+This action 
+
+```mermaid
+graph LR
+  subgraph main Branch;
+    A[commit 1] --> B[commit 2];
+    B[commit 2] --> C[commit 3];
+  end;
+  subgraph Release Tags;
+    A --> RA[tag v1.0.0];
+    B --> RB[tag v1.1.0];
+    C --> RC[tag v1.2.0];
+  end;
+```
 
 
 ## Continuous release workflow
@@ -100,6 +118,8 @@ This action assumes the following layout:
   - `.gitignore` contains `dist/`
   - Generated files are under `*/dist`
   - Action definitions are at `*/action.yaml`
+
+It creates a new release only if the generated file(s) or action definition is changed.
 
 
 ### Inputs
