@@ -26,12 +26,12 @@ export const createNextMinorRelease = async (inputs: Inputs) => {
   await exec.exec('git', ['tag', '-f', majorTag])
 
   if (currentTag !== undefined) {
-    core.info('Checking if the gerenated files are changed')
     const diffNames = await gitDiff(currentTag, nextTag)
     if (!isGeneratedFileChanged(diffNames)) {
       core.info('Nothing to release')
       return
     }
+    core.info('Generated file(s) is changed')
   }
   if (github.context.eventName === 'pull_request') {
     core.warning(`Next release is ${nextTag} but do nothing on pull request`)
