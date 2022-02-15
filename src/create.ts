@@ -27,26 +27,8 @@ export const createNextMinorRelease = async (inputs: Inputs) => {
 
   if (currentTag !== undefined) {
     core.info('Checking if the gerenated files are changed')
-    const code = await exec.exec(
-      'git',
-      [
-        'diff',
-        '--exit-code',
-        currentTag,
-        nextTag,
-        '--',
-        // for polyrepo
-        'dist',
-        'action.yaml',
-        // for monorepo
-        '*/dist',
-        '*/action.yaml',
-      ],
-      {
-        ignoreReturnCode: true,
-      }
-    )
-    if (code === 0) {
+    const diffNames = await gitDiff(currentTag, nextTag)
+    if (!isGeneratedFileChanged(diffNames)) {
       core.info('Nothing to release')
       return
     }
@@ -82,4 +64,27 @@ const findCurrentTag = async (majorTag: string) => {
     ignoreReturnCode: true,
   })
   return tags.filter((tag) => tag != majorTag).pop()
+}
+
+const gitDiff = async (currentTag: string, nextTag: string) => {
+  const diffNames: string[] = []
+  await exec.exec('git', ['diff', '--name-only', currentTag, nextTag, '--'], {
+    listeners: {
+      stdline: (l) => diffNames.push(l.trim()),
+    },
+  })
+  return diffNames
+}
+
+export const isGeneratedFileChanged = (diffNames: string[]): boolean => {
+  for (const diffName of diffNames) {
+    const [parent, child] = diffName.split('/')
+    if (parent === 'dist' || parent === 'action.yaml') {
+      return true
+    }
+    if (child === 'dist' || child === 'action.yaml') {
+      return true
+    }
+  }
+  return false
 }
