@@ -8,16 +8,13 @@ This is an action to automate the release of an action written in TypeScript.
 This action 
 
 ```mermaid
-graph LR
-  subgraph main Branch;
-    A[commit 1] --> B[commit 2];
-    B[commit 2] --> C[commit 3];
-  end;
-  subgraph Release Tags;
-    A --> RA[tag v1.0.0];
-    B --> RB[tag v1.1.0];
-    C --> RC[tag v1.2.0];
-  end;
+graph TB
+  subgraph branch [main Branch]
+    Z[Initial Commit] --> A[Commit 1] --> B[Commit 2] --> C[Commit 3] --> D[...]
+  end
+  A --> RA[Tag v1.0.0]
+  B --> RB[Tag v1.1.0]
+  C --> RC[Tag v1.2.0]
 ```
 
 
