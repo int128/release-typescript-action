@@ -36,7 +36,7 @@ Only a release tag contains it.
 
 ### Caveat
 
-We cannot specify a branch in a workflow, such as `uses: org/action@main`. Only tag is available.
+We cannot specify a branch in a workflow. Only tag is available, such as `uses: org/action@v1`.
 
 
 ## Continuous release workflow
