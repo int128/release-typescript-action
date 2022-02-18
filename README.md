@@ -119,7 +119,7 @@ This action ignores any pull request event.
 
 ## Specification
 
-This action assumes the following repoisitory layout:
+This action assumes the following repository layout:
 
 - For polyrepo
   - `.gitignore` contains `/dist`
