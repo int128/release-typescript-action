@@ -1,11 +1,47 @@
 # release-typescript-action [![ts](https://github.com/int128/release-typescript-action/actions/workflows/ts.yaml/badge.svg)](https://github.com/int128/release-typescript-action/actions/workflows/ts.yaml)
 
-This is an action to automate the release of a TypeScript Action.
+This is an action to automate the release of an action written in TypeScript.
+
+
+## Problem to solve
+
+Typically we need to commit the generated files (e.g. `dist/index.js`) into main branch,
+because GitHub Actions runs it on Node.js.
+
+It causes the following problems:
+
+- Release workflow is complex
+- Diff would be large because it contains the generated files
+- Commit history would be growth
+
+### Idea
+
+It would be nice to commit the generated files into a release tag only.
+
+This action creates a release tag with the generated files.
+For example,
+
+```mermaid
+graph TB
+  subgraph branch [main Branch]
+    Z[Initial Commit] --> A[Commit A] --> B[Commit B] --> C[Commit C] --> D[...]
+  end
+  A --> RA[Tag v1.0.0]
+  B --> RB[Tag v1.1.0]
+  C --> RC[Tag v1.2.0]
+```
+
+main branch (i.e. Commit A, B and C) does not contain the generated files.
+Only a release tag contains it.
+
+### Caveat
+
+We cannot specify a branch in a workflow. Only tag is available, such as `uses: org/action@v1`.
 
 
 ## Continuous release workflow
 
-Create `.github/workflows/release.yaml` as follows:
+This workflow continuously creates a new release from `main` branch.
 
 ```yaml
 name: release
@@ -35,20 +71,14 @@ jobs:
       - uses: int128/release-typescript-action@v1
 ```
 
-This workflow continuously creates a new release from `main` branch.
-
 When you merge a pull request into `main` branch, this action will create a new release of new minor version.
 For example, if the latest tag `v1.5.0` exists, this action will create a tag `v1.6.0`.
 It will also update the major tag `v1` to track the latest tag.
 
-When you manually push a tag, this action will add a commit with `dist` directory to the tag.
-
-This action ignores any pull request event.
-
 
 ## Daily release workflow
 
-Create `.github/workflows/release.yaml` as follows:
+This workflow everyday creates a new release from `main` branch.
 
 ```yaml
 name: release
@@ -78,9 +108,8 @@ jobs:
       - uses: int128/release-typescript-action@v1
 ```
 
-This workflow everyday creates a new release from `main` branch.
-It bumps the minor version.
-It also updates the major tag `v1` to track the latest tag.
+When a schedule is triggered, this action will create a new minor release.
+It will also update the major tag `v1` to track the latest tag.
 
 You can create a new release instead of the daily release.
 When you push a tag, this action will add a commit with `dist` directory to the tag.
@@ -90,7 +119,7 @@ This action ignores any pull request event.
 
 ## Specification
 
-This action assumes the following layout:
+This action assumes the following repository layout:
 
 - For polyrepo
   - `.gitignore` contains `/dist`
@@ -100,6 +129,10 @@ This action assumes the following layout:
   - `.gitignore` contains `dist/`
   - Generated files are under `*/dist`
   - Action definitions are at `*/action.yaml`
+
+It creates a new release only if the generated file(s) or action definition is changed.
+
+It ignores any pull request event.
 
 
 ### Inputs
