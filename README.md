@@ -11,14 +11,15 @@ because GitHub Actions runs it on Node.js.
 It causes the following problems:
 
 - Release workflow is complex
-- Diff contains the generated files and becomes large
+- Diff would be large because it contains the generated files
+- Commit history would be growth
+
+### Idea
 
 It would be nice to commit the generated files into a release tag only.
 
-
-## Idea
-
-This action provides
+This action creates a release tag with the generated files.
+For example,
 
 ```mermaid
 graph TB
@@ -29,6 +30,13 @@ graph TB
   B --> RB[Tag v1.1.0]
   C --> RC[Tag v1.2.0]
 ```
+
+main branch (i.e. Commit A, B and C) does not contain the generated files.
+Only a release tag contains it.
+
+### Caveat
+
+We cannot specify a branch in a workflow, such as `uses: org/action@main`. Only tag is available.
 
 
 ## Continuous release workflow
@@ -111,7 +119,7 @@ This action ignores any pull request event.
 
 ## Specification
 
-It assumes the following layout:
+This action assumes the following repoisitory layout:
 
 - For polyrepo
   - `.gitignore` contains `/dist`
@@ -122,9 +130,9 @@ It assumes the following layout:
   - Generated files are under `*/dist`
   - Action definitions are at `*/action.yaml`
 
-This action creates a new release only if the generated file(s) or action definition is changed.
+It creates a new release only if the generated file(s) or action definition is changed.
 
-This action ignores any pull request event.
+It ignores any pull request event.
 
 
 ### Inputs
