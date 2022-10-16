@@ -1,12 +1,8 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { createNextMinorRelease } from './create'
+import { createNextRelease } from './create'
 import { followUpCurrentTag } from './update'
-
-type Inputs = {
-  majorVersion: number
-  token: string
-}
+import { Inputs } from './inputs'
 
 export const run = async (inputs: Inputs): Promise<void> => {
   if (github.context.ref.startsWith('refs/tags/')) {
@@ -15,5 +11,5 @@ export const run = async (inputs: Inputs): Promise<void> => {
   }
 
   core.info('Preparing the next release')
-  return createNextMinorRelease(inputs)
+  return createNextRelease(inputs)
 }

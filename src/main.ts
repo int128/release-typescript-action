@@ -1,11 +1,10 @@
 import * as core from '@actions/core'
 import { run } from './run'
+import { getInputs } from './inputs'
 
 const main = async (): Promise<void> => {
-  await run({
-    majorVersion: parseInt(core.getInput('major-version', { required: true })),
-    token: core.getInput('token', { required: true }),
-  })
+  const inputs = getInputs()
+  await run(inputs)
 }
 
 main().catch((e) => core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)))
