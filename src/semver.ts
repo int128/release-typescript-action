@@ -44,11 +44,8 @@ const computeNextVersion = (currentVersion: string, incrementLevel: IncrementLev
     case 'major':
       return `${major + 1}.0.0`
     case 'minor':
-      // if (typeof minor === 'undefined') throw new Error('Unexpected undefined minor version')
       return `${major}.${minor + 1}.0`
     case 'patch':
-      // if (typeof minor === 'undefined') throw new Error('Unexpected undefined minor version')
-      // if (typeof patch === 'undefined') throw new Error('Unexpected undefined patch version')
       return `${major}.${minor}.${patch + 1}`
   }
 }
