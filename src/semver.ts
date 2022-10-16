@@ -3,9 +3,9 @@ import { IncrementLevel } from './inputs'
 export const VERSION_PREFIX = 'v'
 
 interface Tags {
-  patch: string
-  minor: string
   major: string
+  minor: string
+  patch: string
 }
 
 export const computeNextTags = (
@@ -29,6 +29,10 @@ export const computeNextTags = (
   }
 }
 
+/*
+  Given the current version and increment level, 
+  return the next version in full major.minor.patch format.
+*/
 const computeNextVersion = (currentVersion: string, incrementLevel: IncrementLevel): string => {
   const { major, minor, patch } = parseVersion(currentVersion)
   switch (incrementLevel) {
@@ -57,8 +61,6 @@ export const computeTagsForVersion = (version: string): string[] => {
   return tags
 }
 
-export const stripVersionPrefix = (tag: string): string => tag.replace(VERSION_PREFIX, '')
-
 // `Full` is true when the version is known to be complete (major.minor.patch).
 interface ParsedVersion<Full extends boolean = false> {
   major: number
@@ -77,11 +79,25 @@ export function parseVersion<Full extends boolean = false>(version: string): Par
   return { major, minor, patch } as ParsedVersion<Full>
 }
 
+export const stripVersionPrefix = (tag: string): string => tag.replace(VERSION_PREFIX, '')
+
+/*
+  Given a version string, return the tag form.
+  1 --> v1
+  1.2.3 --> v1.2.3
+  v1.2.3 --> v1.2.3
+*/
 export const toTag = (version: number | string): string => {
   const versionString = String(version)
   return versionString.startsWith(VERSION_PREFIX) ? versionString : `${VERSION_PREFIX}${versionString}`
 }
 
+/* 
+  Given a tag, return the version string with no prefix.
+  v1 --> 1
+  v1.2.3 --> 1.2.3
+  1.2.3 --> 1.2.3
+*/
 export const toVersion = (tag: string): string => {
   return stripVersionPrefix(tag)
 }
