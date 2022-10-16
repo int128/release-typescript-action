@@ -11,8 +11,9 @@ export const followUpCurrentTag = async () => {
   }
   const currentVersion = toVersion(currentTag)
   const tagsToUpdate = computeTagsForVersion(currentVersion)
-  const tagsToUpdateString = tagsToUpdate.join(', ')
-  core.info(`Tags to update: ${tagsToUpdateString}`)
+  const tagsArray = Object.values(tagsToUpdate).filter((t) => typeof t !== "undefined") as string[]
+  const tagsString = tagsArray.join(', ')
+  core.info(`Tags to update: ${tagsString}`)
 
   await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])
   await exec.exec('git', ['add', '.'])
@@ -24,10 +25,10 @@ export const followUpCurrentTag = async () => {
   await exec.exec('git', ['config', 'user.name', 'github-actions'])
   await exec.exec('git', ['config', 'user.email', 'github-actions@github.com'])
   await exec.exec('git', ['commit', '-m', `Release ${currentTag}`])
-  for (const tag of tagsToUpdate) {
+  for (const tag of tagsArray) {
     await exec.exec('git', ['tag', '-f', tag])
   }
-  await exec.exec('git', ['push', 'origin', '-f', ...tagsToUpdate])
+  await exec.exec('git', ['push', 'origin', '-f', ...tagsArray])
 }
 
 const gitStatus = async (): Promise<string> => {

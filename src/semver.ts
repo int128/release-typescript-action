@@ -8,55 +8,58 @@ interface Tags {
   patch: string
 }
 
-export const computeNextTags = (
+export function computeNextTags<TIncrementLevel extends IncrementLevel> (
   currentTag: string | undefined,
-  incrementLevel: IncrementLevel,
+  incrementLevel: TIncrementLevel,
   defaultMajorVersion: number
-): Tags => {
+): Tags {
   if (currentTag === undefined)
     return {
       major: toTag(defaultMajorVersion),
       minor: toTag(`${defaultMajorVersion}.0`),
       patch: toTag(`${defaultMajorVersion}.0.0`),
     }
-  const currentVersion = stripVersionPrefix(currentTag)
+  const currentVersion = toVersion(currentTag);
   const nextVersion = computeNextVersion(currentVersion, incrementLevel)
-  const { major, minor } = parseVersion<true>(nextVersion)
-  return {
-    major: toTag(major),
-    minor: toTag(`${major}.${minor}`),
-    patch: toTag(nextVersion),
-  }
+  return computeTagsForVersion(nextVersion)
 }
+
+/*
+  Given a version string like `1` or `v1`, return a full version string like `1.0.0`.
+  This could help in cases where the user has manually created a tag like `v1`
+  (without a minor or patch version) before using this action.
+*/
+export const dangerouslyExpandVersion = (currentVersion: string): string => {
+  const { major, minor, patch } = parseVersion(currentVersion);
+  return `${major}.${minor ?? 0}.${patch ?? 0}`;
+};
 
 /*
   Given the current version and increment level, 
   return the next version in full major.minor.patch format.
 */
 const computeNextVersion = (currentVersion: string, incrementLevel: IncrementLevel): string => {
-  const { major, minor, patch } = parseVersion(currentVersion)
+  const { major, minor, patch } = parseVersion<true>(dangerouslyExpandVersion(currentVersion));
   switch (incrementLevel) {
     case 'major':
       return `${major + 1}.0.0`
     case 'minor':
-      if (typeof minor === 'undefined') throw new Error('Unexpected undefined minor version')
+      // if (typeof minor === 'undefined') throw new Error('Unexpected undefined minor version')
       return `${major}.${minor + 1}.0`
     case 'patch':
-      if (typeof minor === 'undefined') throw new Error('Unexpected undefined minor version')
-      if (typeof patch === 'undefined') throw new Error('Unexpected undefined patch version')
+      // if (typeof minor === 'undefined') throw new Error('Unexpected undefined minor version')
+      // if (typeof patch === 'undefined') throw new Error('Unexpected undefined patch version')
       return `${major}.${minor}.${patch + 1}`
   }
 }
 
 // Given a version string (1.2.3), return the associated tags (v1, v1.2, v1.2.3)
-export const computeTagsForVersion = (version: string): string[] => {
-  const { major, minor, patch } = parseVersion(version)
-  const tags = [toTag(major)]
-  if (typeof minor !== 'undefined') {
-    tags.push(toTag(`${major}.${minor}`))
-    if (typeof patch !== 'undefined') {
-      tags.push(toTag(`${major}.${minor}.${patch}`))
-    }
+export const computeTagsForVersion = (version: string): Tags => {
+  const { major: majorVersion, minor: minorVersion, patch: patchVersion } = parseVersion(version)
+  const tags: Tags = {
+    major: toTag(majorVersion),
+    minor: toTag(`${majorVersion}.${minorVersion ?? 0}`),
+    patch: toTag(`${majorVersion}.${minorVersion ?? 0}.${patchVersion ?? 0}`),
   }
   return tags
 }
@@ -67,8 +70,6 @@ interface ParsedVersion<Full extends boolean = false> {
   minor: Full extends true ? number : number | undefined
   patch: Full extends true ? number : number | undefined
 }
-
-// `Full` is true when the version is known to be complete (major.minor.patch).
 export function parseVersion<Full extends boolean = false>(version: string): ParsedVersion<Full> {
   const versionNumberArray = stripVersionPrefix(version)
     .split('.')
