@@ -99,3 +99,7 @@ lib/
 
 # Only release tag contains dist directory
 /dist
+
+# Yarn
+.yarn
+.pnp.*

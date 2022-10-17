@@ -1,6 +1,3 @@
 {
-  "extends": [
-    "config:base",
-    "github>int128/typescript-action-renovate-config"
-  ]
+  extends: ['config:base', 'github>int128/typescript-action-renovate-config'],
 }

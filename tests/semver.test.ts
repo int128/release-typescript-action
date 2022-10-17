@@ -1,13 +1,13 @@
-import { computeNextTag } from '../src/semver'
+import { computeNextTags } from '../src/semver'
 
 test('a tag is given', () => {
-  expect(computeNextTag('v1.1.0', 'v1')).toBe('v1.2.0')
+  expect(computeNextTags('v1.1.0', 'minor', 1).patch).toBe('v1.2.0')
 })
 
 test('undefined is given', () => {
-  expect(computeNextTag(undefined, 'v1')).toBe('v1.0.0')
+  expect(computeNextTags(undefined, 'minor', 1).patch).toBe('v1.0.0')
 })
 
 test('invalid tag is given', () => {
-  expect(computeNextTag('v1.x.y', 'v1')).toBe('v1.0.0')
+  expect(computeNextTags('v1.x.y', 'minor', 1).patch).toBe('v1.0.0')
 })

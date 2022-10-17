@@ -1,11 +1,115 @@
-export const computeNextTag = (currentTag: string | undefined, majorTag: string): string => {
-  if (currentTag === undefined) {
-    return `${majorTag}.0.0`
+import { IncrementLevel } from './inputs'
+
+export const VERSION_PREFIX = 'v'
+
+interface Tags {
+  major: string
+  minor: string
+  patch: string
+}
+
+export function computeNextTags<TIncrementLevel extends IncrementLevel>(
+  currentTag: string | undefined,
+  incrementLevel: TIncrementLevel,
+  defaultMajorVersion: number
+): Tags {
+  const initialTags = {
+    major: toTag(defaultMajorVersion),
+    minor: toTag(`${defaultMajorVersion}.0`),
+    patch: toTag(`${defaultMajorVersion}.0.0`),
   }
-  const [, minor] = currentTag.split('.')
-  const minorNumber = parseInt(minor)
-  if (!Number.isSafeInteger(minorNumber)) {
-    return `${majorTag}.0.0`
+  if (currentTag === undefined) return initialTags
+  const currentVersion = toVersion(currentTag)
+  if (!currentVersion) return initialTags
+  const nextVersion = computeNextVersion(currentVersion, incrementLevel)
+  return computeTagsForVersion(nextVersion)
+}
+
+/*
+  Given a version string like `1` or `v1`, return a full version string like `1.0.0`.
+  This could help in cases where the user has manually created a tag like `v1`
+  (without a minor or patch version) before using this action.
+*/
+export const dangerouslyExpandVersion = (currentVersion: string): string => {
+  const { major, minor, patch } = parseVersion(currentVersion)
+  return `${major}.${minor ?? 0}.${patch ?? 0}`
+}
+
+/*
+  Given the current version and increment level, 
+  return the next version in full major.minor.patch format.
+*/
+const computeNextVersion = (currentVersion: string, incrementLevel: IncrementLevel): string => {
+  const { major, minor, patch } = parseVersion<true>(dangerouslyExpandVersion(currentVersion))
+  switch (incrementLevel) {
+    case 'major':
+      return `${major + 1}.0.0`
+    case 'minor':
+      return `${major}.${minor + 1}.0`
+    case 'patch':
+      return `${major}.${minor}.${patch + 1}`
   }
-  return `${majorTag}.${minorNumber + 1}.0`
+}
+
+// Given a version string (1.2.3), return the associated tags (v1, v1.2, v1.2.3)
+export const computeTagsForVersion = (version: string): Tags => {
+  const { major: majorVersion, minor: minorVersion, patch: patchVersion } = parseVersion(version)
+  const tags: Tags = {
+    major: toTag(majorVersion),
+    minor: toTag(`${majorVersion}.${minorVersion ?? 0}`),
+    patch: toTag(`${majorVersion}.${minorVersion ?? 0}.${patchVersion ?? 0}`),
+  }
+  return tags
+}
+
+// `Full` is true when the version is known to be complete (major.minor.patch).
+interface ParsedVersion<Full extends boolean = false> {
+  major: number
+  minor: Full extends true ? number : number | undefined
+  patch: Full extends true ? number : number | undefined
+}
+export function parseVersion<Full extends boolean = false>(version: string): ParsedVersion<Full> {
+  const versionNumberArray = stripVersionPrefix(version)
+    .split('.')
+    .map((s) => parseInt(s))
+  const major = versionNumberArray[0]
+  const minor = versionNumberArray.length >= 2 ? versionNumberArray[1] : undefined
+  const patch = versionNumberArray.length >= 3 ? versionNumberArray[2] : undefined
+  return { major, minor, patch } as ParsedVersion<Full>
+}
+
+export const stripVersionPrefix = (tag: string): string => tag.replace(VERSION_PREFIX, '')
+
+/*
+  Given a version string, return the tag form.
+  1 --> v1
+  1.2.3 --> v1.2.3
+  v1.2.3 --> v1.2.3
+*/
+export const toTag = (version: number | string): string => {
+  const versionString = String(version)
+  return versionString.startsWith(VERSION_PREFIX) ? versionString : `${VERSION_PREFIX}${versionString}`
+}
+
+/* 
+  Given a tag, return the version string with no prefix.
+  v1 --> 1
+  v1.2.3 --> 1.2.3
+  1.2.3 --> 1.2.3
+
+  If the tag is invalid, return undefined.
+  v1.x.y --> undefined
+*/
+export const toVersion = (tag: string): string | undefined => {
+  const version = stripVersionPrefix(tag)
+  if (!versionIsValid(version)) return undefined
+  return version
+}
+
+export const versionIsValid = (version: string): boolean => {
+  const pieces: string[] = version.split('.')
+  for (const piece of pieces) {
+    if (isNaN(parseInt(piece))) return false
+  }
+  return true
 }
