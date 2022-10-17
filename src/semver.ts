@@ -8,7 +8,7 @@ interface Tags {
   patch: string
 }
 
-export function computeNextTags<TIncrementLevel extends IncrementLevel> (
+export function computeNextTags<TIncrementLevel extends IncrementLevel>(
   currentTag: string | undefined,
   incrementLevel: TIncrementLevel,
   defaultMajorVersion: number
@@ -19,7 +19,7 @@ export function computeNextTags<TIncrementLevel extends IncrementLevel> (
       minor: toTag(`${defaultMajorVersion}.0`),
       patch: toTag(`${defaultMajorVersion}.0.0`),
     }
-  const currentVersion = toVersion(currentTag);
+  const currentVersion = toVersion(currentTag)
   const nextVersion = computeNextVersion(currentVersion, incrementLevel)
   return computeTagsForVersion(nextVersion)
 }
@@ -30,16 +30,16 @@ export function computeNextTags<TIncrementLevel extends IncrementLevel> (
   (without a minor or patch version) before using this action.
 */
 export const dangerouslyExpandVersion = (currentVersion: string): string => {
-  const { major, minor, patch } = parseVersion(currentVersion);
-  return `${major}.${minor ?? 0}.${patch ?? 0}`;
-};
+  const { major, minor, patch } = parseVersion(currentVersion)
+  return `${major}.${minor ?? 0}.${patch ?? 0}`
+}
 
 /*
   Given the current version and increment level, 
   return the next version in full major.minor.patch format.
 */
 const computeNextVersion = (currentVersion: string, incrementLevel: IncrementLevel): string => {
-  const { major, minor, patch } = parseVersion<true>(dangerouslyExpandVersion(currentVersion));
+  const { major, minor, patch } = parseVersion<true>(dangerouslyExpandVersion(currentVersion))
   switch (incrementLevel) {
     case 'major':
       return `${major + 1}.0.0`

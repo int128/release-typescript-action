@@ -11,7 +11,7 @@ export const followUpCurrentTag = async () => {
   }
   const currentVersion = toVersion(currentTag)
   const tagsToUpdate = computeTagsForVersion(currentVersion)
-  const tagsArray = Object.values(tagsToUpdate).filter((t) => typeof t !== "undefined") as string[]
+  const tagsArray = Object.values(tagsToUpdate).filter((t) => typeof t !== 'undefined') as string[]
   const tagsString = tagsArray.join(', ')
   core.info(`Tags to update: ${tagsString}`)
 
