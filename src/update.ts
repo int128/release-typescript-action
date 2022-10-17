@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
-import { computeTagsForVersion, toVersion } from './semver'
+import { computeTagsForVersion, toVersion, versionIsValid } from './semver'
 
 export const followUpCurrentTag = async () => {
   const currentTag = github.context.ref.substring('refs/tags/'.length)
@@ -10,6 +10,7 @@ export const followUpCurrentTag = async () => {
     throw Error(`Tag name should start with v but was ${currentTag}`)
   }
   const currentVersion = toVersion(currentTag)
+  if (!currentVersion) throw new Error(`Invalid tag: ${currentTag}`)
   const tagsToUpdate = computeTagsForVersion(currentVersion)
   const tagsArray = Object.values(tagsToUpdate).filter((t) => typeof t !== 'undefined') as string[]
   const tagsString = tagsArray.join(', ')
