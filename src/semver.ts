@@ -13,13 +13,14 @@ export function computeNextTags<TIncrementLevel extends IncrementLevel>(
   incrementLevel: TIncrementLevel,
   defaultMajorVersion: number
 ): Tags {
-  if (currentTag === undefined)
-    return {
-      major: toTag(defaultMajorVersion),
-      minor: toTag(`${defaultMajorVersion}.0`),
-      patch: toTag(`${defaultMajorVersion}.0.0`),
-    }
+  const initialTags = {
+    major: toTag(defaultMajorVersion),
+    minor: toTag(`${defaultMajorVersion}.0`),
+    patch: toTag(`${defaultMajorVersion}.0.0`),
+  }
+  if (currentTag === undefined) return initialTags
   const currentVersion = toVersion(currentTag)
+  if (!currentVersion) return initialTags
   const nextVersion = computeNextVersion(currentVersion, incrementLevel)
   return computeTagsForVersion(nextVersion)
 }
@@ -95,7 +96,20 @@ export const toTag = (version: number | string): string => {
   v1 --> 1
   v1.2.3 --> 1.2.3
   1.2.3 --> 1.2.3
+
+  If the tag is invalid, return undefined.
+  v1.x.y --> undefined
 */
-export const toVersion = (tag: string): string => {
-  return stripVersionPrefix(tag)
+export const toVersion = (tag: string): string | undefined => {
+  const version = stripVersionPrefix(tag)
+  if (!versionIsValid(version)) return undefined
+  return version
+}
+
+export const versionIsValid = (version: string): boolean => {
+  const pieces: string[] = version.split('.')
+  for (const piece of pieces) {
+    if (isNaN(parseInt(piece))) return false
+  }
+  return true
 }
