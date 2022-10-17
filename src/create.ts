@@ -7,9 +7,9 @@ import { Inputs } from './inputs'
 const DEFAULT_MAJOR_VERSION = 1
 
 export const createNextRelease = async ({ majorVersion, incrementLevel, token }: Inputs) => {
-  // Get the current tag, if any. The current tag might be 
+  // Get the current tag, if any. The current tag might be
   // a major version (v1), a minor version (v1.2), or a patch version (v1.2.3).
-  // Ideally, the current tag should be a patch version, 
+  // Ideally, the current tag should be a patch version,
   // but it's possible that the user has manually created a tag like v1 or v1.0.
   const currentTag = await findCurrentTag(majorVersion)
   core.info(`Current tag: ${currentTag ?? 'not found'}`)
@@ -18,8 +18,8 @@ export const createNextRelease = async ({ majorVersion, incrementLevel, token }:
   // If the current tag is v1.2.3 and the increment level is patch:
   // { major: v1, minor: v1.2, patch: v1.2.4 }
   const nextTags = computeNextTags(currentTag, incrementLevel, majorVersion ?? DEFAULT_MAJOR_VERSION)
-  const nextTagsArray = Object.values(nextTags) as string[]  // [v1, v1.2, v1.2.4]
-  const representativeNextTag = nextTags[incrementLevel]  // v1.2.4
+  const nextTagsArray = Object.values(nextTags) as string[] // [v1, v1.2, v1.2.4]
+  const representativeNextTag = nextTags[incrementLevel] // v1.2.4
   core.info(`Next tag: ${representativeNextTag}`)
 
   // Remove dist/ from .gitignore so it can be committed for the release.
@@ -51,7 +51,7 @@ export const createNextRelease = async ({ majorVersion, incrementLevel, token }:
     core.warning(`Next release is ${representativeNextTag}; ignoring pull request event ...`)
     return
   }
-  
+
   // Push the tags.
   await exec.exec('git', ['push', 'origin', '-f', ...nextTagsArray])
 

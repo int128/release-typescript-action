@@ -2,7 +2,6 @@
 
 This is an action to automate the release of an action written in TypeScript.
 
-
 ## Problem to solve
 
 Typically we need to commit the generated files (e.g. `dist/index.js`) into main branch,
@@ -37,7 +36,6 @@ Only a release tag contains it.
 ### Caveat
 
 We cannot specify a branch in a workflow. Only tag is available, such as `uses: org/action@v1`.
-
 
 ## Continuous release workflow
 
@@ -75,7 +73,6 @@ When you merge a pull request into `main` branch, this action will create a new 
 For example, if the latest tag `v1.5.0` exists, this action will create a tag `v1.6.0`.
 It will also update the major tag `v1` to track the latest tag.
 
-
 ## Daily release workflow
 
 This workflow everyday creates a new release from `main` branch.
@@ -91,7 +88,7 @@ on:
     tags:
       - v*
   schedule:
-    - cron: "0 0 * * *"
+    - cron: '0 0 * * *'
 
 jobs:
   tag:
@@ -116,7 +113,6 @@ When you push a tag, this action will add a commit with `dist` directory to the 
 
 This action ignores any pull request event.
 
-
 ## Specification
 
 This action assumes the following repository layout:
@@ -134,13 +130,12 @@ It creates a new release only if the generated file(s) or action definition is c
 
 It ignores any pull request event.
 
-
 ### Inputs
 
-| Name | Default | Description
-|------|----------|------------
-| `major-version` | `1` | Major version for which to create the release
-| `increment-level` | `minor` | Increment level ('patch', 'minor', or 'major')
-| `token` | `github.token` | GitHub token
+| Name              | Default        | Description                                    |
+| ----------------- | -------------- | ---------------------------------------------- |
+| `major-version`   | `1`            | Major version for which to create the release  |
+| `increment-level` | `minor`        | Increment level ('patch', 'minor', or 'major') |
+| `token`           | `github.token` | GitHub token                                   |
 
 If you want to create a new major release, set `major-version` to 2 or greater.
