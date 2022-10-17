@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
-import { computeTagsForVersion, toVersion, versionIsValid } from './semver'
+import { computeTagsForVersion, toVersion } from './semver'
 
 export const followUpCurrentTag = async () => {
   const currentTag = github.context.ref.substring('refs/tags/'.length)
