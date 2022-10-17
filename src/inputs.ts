@@ -10,7 +10,7 @@ export type Inputs = {
 
 export const getInputs = (): Inputs => {
   const majorVersionInput = core.getInput('major-version', { required: false })
-  const incrementLevel = core.getInput('semver-increment-level', { required: true }) as IncrementLevel
+  const incrementLevel = core.getInput('increment-level', { required: true }) as IncrementLevel
   if (!['major', 'minor', 'patch'].includes(incrementLevel)) {
     throw new Error(`Invalid increment level: ${incrementLevel}`)
   }

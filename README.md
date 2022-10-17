@@ -139,7 +139,8 @@ It ignores any pull request event.
 
 | Name | Default | Description
 |------|----------|------------
-| `major-version` | `1` | Major version to create a tag
+| `major-version` | `1` | Major version for which to create the release
+| `increment-level` | `minor` | Increment level ('patch', 'minor', or 'major')
 | `token` | `github.token` | GitHub token
 
 If you want to create a new major release, set `major-version` to 2 or greater.
