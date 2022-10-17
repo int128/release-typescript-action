@@ -5,7 +5,7 @@
     "build": "tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
-    "lint": "eslint **/*.ts",
+    "lint": "eslint src",
     "package": "ncc build --source-map --license licenses.txt",
     "prepare": "husky install",
     "test": "jest"
