@@ -18,10 +18,8 @@ export const createNextRelease = async ({ majorVersion, incrementLevel, token }:
   // If the current tag is v1.2.3 and the increment level is patch:
   // { major: v1, minor: v1.2, patch: v1.2.4 }
   const nextTags = computeNextTags(currentTag, incrementLevel, majorVersion ?? DEFAULT_MAJOR_VERSION)
-  // [v1, v1.2, v1.2.4]
-  const nextTagsArray = Object.values(nextTags) as string[]
-  // v1.2.4
-  const representativeNextTag = nextTags[incrementLevel]
+  const nextTagsArray = Object.values(nextTags) as string[]  // [v1, v1.2, v1.2.4]
+  const representativeNextTag = nextTags[incrementLevel]  // v1.2.4
   core.info(`Next tag: ${representativeNextTag}`)
 
   // Remove dist/ from .gitignore so it can be committed for the release.
