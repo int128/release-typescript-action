@@ -79,10 +79,10 @@ const gitDiff = async (currentTag: string, nextTag: string) => {
 export const isGeneratedFileChanged = (diffNames: string[]): boolean => {
   for (const diffName of diffNames) {
     const [parent, child] = diffName.split('/')
-    if (parent === 'dist' || parent === 'action.yaml') {
+    if (parent === 'dist' || parent === 'action.yaml' || parent === 'action.yml') {
       return true
     }
-    if (child === 'dist' || child === 'action.yaml') {
+    if (child === 'dist' || child === 'action.yaml' || child === 'action.yml') {
       return true
     }
   }
