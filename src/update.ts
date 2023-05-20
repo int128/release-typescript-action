@@ -27,7 +27,6 @@ export const followUpCurrentTag = async () => {
 }
 
 const gitStatus = async (): Promise<string> => {
-  const chunks: Buffer[] = []
-  await exec.exec('git', ['status', '--porcelain'], { listeners: { stdout: (b) => chunks.push(b) } })
-  return Buffer.concat(chunks).toString().trim()
+  const { stdout } = await exec.getExecOutput('git', ['status', '--porcelain'])
+  return stdout.trim()
 }
