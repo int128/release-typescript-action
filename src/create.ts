@@ -1,19 +1,20 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
-import { computeNextTag } from './semver'
+import { Level, computeNextTag } from './semver'
 
 type Inputs = {
   majorVersion: number
+  level: Level
   token: string
 }
 
-export const createNextMinorRelease = async (inputs: Inputs) => {
+export const createNextRelease = async (inputs: Inputs) => {
   const majorTag = `v${inputs.majorVersion}`
   core.info(`Major tag is ${majorTag}`)
   const currentTag = await findCurrentTag(majorTag)
   core.info(`Current tag is ${currentTag ?? 'not found'}`)
-  const nextTag = computeNextTag(currentTag, majorTag)
+  const nextTag = computeNextTag(currentTag, majorTag, inputs.level)
   core.info(`Next tag is ${nextTag}`)
 
   await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])
