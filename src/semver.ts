@@ -1,10 +1,10 @@
-type BumpComponent = 'minor' | 'patch'
+export type Level = 'minor' | 'patch'
 
-export const computeNextTag = (currentTag: string | undefined, majorTag: string, bump: BumpComponent): string => {
+export const computeNextTag = (currentTag: string | undefined, majorTag: string, level: Level): string => {
   if (currentTag === undefined) {
     return `${majorTag}.0.0`
   }
-  if (bump === 'patch') {
+  if (level === 'patch') {
     return computeNextPatchTag(currentTag, majorTag)
   }
   return computeNextMinorTag(currentTag, majorTag)

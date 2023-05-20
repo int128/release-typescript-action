@@ -6,7 +6,7 @@ inputs:
     description: major version
     required: true
     default: '1'
-  bump-component:
+  increment-level:
     description: minor or patch
     required: true
     default: minor

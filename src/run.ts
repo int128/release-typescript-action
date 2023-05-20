@@ -5,7 +5,7 @@ import { followUpCurrentTag } from './update'
 
 type Inputs = {
   majorVersion: number
-  bumpComponent: string
+  incrementLevel: string
   token: string
 }
 
@@ -16,9 +16,9 @@ export const run = async (inputs: Inputs): Promise<void> => {
   }
 
   core.info('Preparing the next release')
-  const { bumpComponent } = inputs
-  if (bumpComponent !== 'minor' && bumpComponent !== 'patch') {
-    throw new Error(`bump-component must be minor or patch`)
+  const { incrementLevel } = inputs
+  if (incrementLevel !== 'minor' && incrementLevel !== 'patch') {
+    throw new Error(`increment-level must be either minor or patch`)
   }
-  return createNextRelease({ ...inputs, bumpComponent })
+  return createNextRelease({ ...inputs, level: incrementLevel })
 }
