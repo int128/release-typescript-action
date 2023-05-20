@@ -8,13 +8,14 @@ describe('bump the minor version', () => {
   test.each([
     ['v1.0.0', 'v1.1.0'],
     ['v1.0.1', 'v1.1.0'],
-    ['v1.0.2', 'v1.1.0'],
     ['v1.1.0', 'v1.2.0'],
     ['v1.1.1', 'v1.2.0'],
-    ['v1.1.2', 'v1.2.0'],
     ['v1.2.0', 'v1.3.0'],
     ['v1.2.1', 'v1.3.0'],
-    ['v1.2.2', 'v1.3.0'],
+    ['v1.999.0', 'v1.1000.0'],
+    ['v1.999.999', 'v1.1000.0'],
+    ['v1.0.0-alpha', 'v1.1.0'],
+    ['v1.0.0+20130313144700', 'v1.1.0'],
   ])('computeNextTag(%s)', (currentTag, nextTag) => {
     expect(computeNextTag(currentTag, 'v1', 'minor')).toBe(nextTag)
   })
@@ -24,7 +25,7 @@ describe('bump the minor version', () => {
   })
 
   test('current tag is invalid', () => {
-    expect(() => computeNextTag('v1.x.y', 'v1', 'minor')).toThrow(/minor/)
+    expect(() => computeNextTag('v1.x.y', 'v1', 'minor')).toThrow(/current tag/)
   })
 })
 
@@ -36,13 +37,14 @@ describe('bump the patch version', () => {
   test.each([
     ['v1.0.0', 'v1.0.1'],
     ['v1.0.1', 'v1.0.2'],
-    ['v1.0.2', 'v1.0.3'],
     ['v1.1.0', 'v1.1.1'],
     ['v1.1.1', 'v1.1.2'],
-    ['v1.1.2', 'v1.1.3'],
     ['v1.2.0', 'v1.2.1'],
     ['v1.2.1', 'v1.2.2'],
-    ['v1.2.2', 'v1.2.3'],
+    ['v1.999.0', 'v1.999.1'],
+    ['v1.999.999', 'v1.999.1000'],
+    ['v1.0.0-alpha', 'v1.0.1'],
+    ['v1.0.0+20130313144700', 'v1.0.1'],
   ])('computeNextTag(%s)', (currentTag, nextTag) => {
     expect(computeNextTag(currentTag, 'v1', 'patch')).toBe(nextTag)
   })
@@ -52,6 +54,6 @@ describe('bump the patch version', () => {
   })
 
   test('current tag is invalid', () => {
-    expect(() => computeNextTag('v1.x.y', 'v1', 'patch')).toThrow(/patch/)
+    expect(() => computeNextTag('v1.x.y', 'v1', 'patch')).toThrow(/current tag/)
   })
 })

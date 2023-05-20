@@ -4,33 +4,16 @@ export const computeNextTag = (currentTag: string | undefined, majorTag: string,
   if (currentTag === undefined) {
     return `${majorTag}.0.0`
   }
+  // https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+  const currentTagMatcher = currentTag.match(/^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)/)
+  if (!currentTagMatcher) {
+    throw new Error(`current tag ${currentTag} is not in form of v0.0.0`)
+  }
+  const [, , minor, patch] = currentTagMatcher
   if (level === 'patch') {
-    return computeNextPatchTag(currentTag, majorTag)
+    const patchNumber = parseInt(patch)
+    return `${majorTag}.${minor}.${patchNumber + 1}`
   }
-  return computeNextMinorTag(currentTag, majorTag)
-}
-
-const computeNextMinorTag = (currentTag: string, majorTag: string): string => {
-  const currentTagComponents = currentTag.split('.')
-  if (currentTagComponents.length < 2) {
-    throw new Error(`current tag ${currentTag} does not have minor component`)
-  }
-  const minorNumber = parseInt(currentTagComponents[1])
-  if (!Number.isSafeInteger(minorNumber)) {
-    throw new Error(`current tag ${currentTag} does not have a valid minor number`)
-  }
+  const minorNumber = parseInt(minor)
   return `${majorTag}.${minorNumber + 1}.0`
-}
-
-const computeNextPatchTag = (currentTag: string, majorTag: string): string => {
-  const currentTagComponents = currentTag.split('.')
-  if (currentTagComponents.length < 3) {
-    throw new Error(`current tag ${currentTag} does not have patch component`)
-  }
-  const minor = currentTagComponents[1]
-  const patchNumber = parseInt(currentTagComponents[2])
-  if (!Number.isSafeInteger(patchNumber)) {
-    throw new Error(`current tag ${currentTag} does not have a valid patch number`)
-  }
-  return `${majorTag}.${minor}.${patchNumber + 1}`
 }
