@@ -10,6 +10,11 @@ describe('generated file is changed in polyrepo', () => {
     expect(isGeneratedFileChanged(diffNames)).toBe(true)
   })
 
+  test('action.yml is changed', () => {
+    const diffNames = ['action.yml']
+    expect(isGeneratedFileChanged(diffNames)).toBe(true)
+  })
+
   test('dist is changed', () => {
     const diffNames = ['dist/index.js']
     expect(isGeneratedFileChanged(diffNames)).toBe(true)
@@ -24,6 +29,11 @@ describe('generated file is changed in polyrepo', () => {
 describe('generated file is changed in monorepo', () => {
   test('action.yaml is changed', () => {
     const diffNames = ['hello/action.yaml']
+    expect(isGeneratedFileChanged(diffNames)).toBe(true)
+  })
+
+  test('action.yml is changed', () => {
+    const diffNames = ['hello/action.yml']
     expect(isGeneratedFileChanged(diffNames)).toBe(true)
   })
 
