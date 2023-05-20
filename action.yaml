@@ -6,6 +6,10 @@ inputs:
     description: major version
     required: true
     default: '1'
+  bump-component:
+    description: minor or patch
+    required: true
+    default: minor
   token:
     description: GitHub token
     required: true

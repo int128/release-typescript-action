@@ -5,15 +5,16 @@ import { computeNextTag } from './semver'
 
 type Inputs = {
   majorVersion: number
+  bumpComponent: 'minor' | 'patch'
   token: string
 }
 
-export const createNextMinorRelease = async (inputs: Inputs) => {
+export const createNextRelease = async (inputs: Inputs) => {
   const majorTag = `v${inputs.majorVersion}`
   core.info(`Major tag is ${majorTag}`)
   const currentTag = await findCurrentTag(majorTag)
   core.info(`Current tag is ${currentTag ?? 'not found'}`)
-  const nextTag = computeNextTag(currentTag, majorTag)
+  const nextTag = computeNextTag(currentTag, majorTag, inputs.bumpComponent)
   core.info(`Next tag is ${nextTag}`)
 
   await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])

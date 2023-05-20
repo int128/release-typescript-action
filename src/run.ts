@@ -1,10 +1,11 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { createNextMinorRelease } from './create'
+import { createNextRelease } from './create'
 import { followUpCurrentTag } from './update'
 
 type Inputs = {
   majorVersion: number
+  bumpComponent: string
   token: string
 }
 
@@ -15,5 +16,9 @@ export const run = async (inputs: Inputs): Promise<void> => {
   }
 
   core.info('Preparing the next release')
-  return createNextMinorRelease(inputs)
+  const { bumpComponent } = inputs
+  if (bumpComponent !== 'minor' && bumpComponent !== 'patch') {
+    throw new Error(`bump-component must be minor or patch`)
+  }
+  return createNextRelease({ ...inputs, bumpComponent })
 }
