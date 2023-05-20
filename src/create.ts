@@ -55,25 +55,20 @@ export const createNextMinorRelease = async (inputs: Inputs) => {
 }
 
 const findCurrentTag = async (majorTag: string) => {
-  const tags: string[] = []
   await exec.exec('git', ['fetch', '--tags', '--prune-tags', '--prune'])
-  await exec.exec('git', ['tag', '--list', '--contains', majorTag], {
-    listeners: {
-      stdline: (l) => tags.push(l.trim()),
-    },
+  const { stdout } = await exec.getExecOutput('git', ['tag', '--list', '--contains', majorTag], {
     ignoreReturnCode: true,
   })
-  return tags.filter((tag) => tag != majorTag).pop()
+  return stdout
+    .trim()
+    .split(/\n/)
+    .filter((tag) => tag != majorTag)
+    .pop()
 }
 
 const gitDiff = async (currentTag: string, nextTag: string) => {
-  const diffNames: string[] = []
-  await exec.exec('git', ['diff', '--name-only', currentTag, nextTag, '--'], {
-    listeners: {
-      stdline: (l) => diffNames.push(l.trim()),
-    },
-  })
-  return diffNames
+  const { stdout } = await exec.getExecOutput('git', ['diff', '--name-only', currentTag, nextTag, '--'])
+  return stdout.trim().split(/\n/)
 }
 
 export const isGeneratedFileChanged = (diffNames: string[]): boolean => {
