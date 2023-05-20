@@ -2,11 +2,9 @@
 
 This is an action to automate the release of an action written in TypeScript.
 
-
 ## Problem to solve
 
-Typically we need to commit the generated files (e.g. `dist/index.js`) into main branch,
-because GitHub Actions runs it on Node.js.
+We need to commit the generated files (e.g. `dist/index.js`) because GitHub Actions runs it on Node.js.
 
 It causes the following problems:
 
@@ -14,7 +12,7 @@ It causes the following problems:
 - Diff would be large because it contains the generated files
 - Commit history would be growth
 
-### Idea
+### How to solve
 
 It would be nice to commit the generated files into a release tag only.
 
@@ -31,15 +29,11 @@ graph TB
   C --> RC[Tag v1.2.0]
 ```
 
-main branch (i.e. Commit A, B and C) does not contain the generated files.
-Only a release tag contains it.
+A release tag (e.g. Tag v1.0.0) contains the generated files, but `main` branch (e.g. Commit A, B and C) does not.
 
-### Caveat
+## Usecases
 
-We cannot specify a branch in a workflow. Only tag is available, such as `uses: org/action@v1`.
-
-
-## Continuous release workflow
+### Continuous release flow
 
 This workflow continuously creates a new release from `main` branch.
 
@@ -49,19 +43,19 @@ name: release
 on:
   pull_request:
     paths:
+      # To test this workflow
       - .github/workflows/release.yaml
   push:
     branches:
+      # When the branch is pushed, release a new version of action
       - main
-    tags:
-      - v*
 
 jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: yarn
@@ -75,8 +69,9 @@ When you merge a pull request into `main` branch, this action will create a new 
 For example, if the latest tag `v1.5.0` exists, this action will create a tag `v1.6.0`.
 It will also update the major tag `v1` to track the latest tag.
 
+See also https://github.com/int128/typescript-action.
 
-## Daily release workflow
+### Daily release flow
 
 This workflow everyday creates a new release from `main` branch.
 
@@ -86,24 +81,17 @@ name: release
 on:
   pull_request:
     paths:
+      # To test this workflow
       - .github/workflows/release.yaml
-  push:
-    tags:
-      - v*
   schedule:
+    # Release a new version every night if there is any change
     - cron: "0 0 * * *"
 
 jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          cache: yarn
-      - run: yarn
-      - run: yarn build
+      # (omit...)
       - run: yarn package
       - uses: int128/release-typescript-action@v1
 ```
@@ -111,11 +99,49 @@ jobs:
 When a schedule is triggered, this action will create a new minor release.
 It will also update the major tag `v1` to track the latest tag.
 
-You can create a new release instead of the daily release.
+### Manual release flow
+
+You can manually create a new release in GitHub.
 When you push a tag, this action will add a commit with `dist` directory to the tag.
 
-This action ignores any pull request event.
+```yaml
+name: release
 
+on:
+  pull_request:
+    paths:
+      # To test this workflow
+      - .github/workflows/release.yaml
+  push:
+    tags:
+      # When a tag is pushed, this action adds the generated files
+      - v*
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      # (omit...)
+      - run: yarn package
+      - uses: int128/release-typescript-action@v1
+```
+
+### Before stable release
+
+To create v0 tag under development,
+
+```yaml
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      # (omit...)
+      - run: yarn package
+      - uses: int128/release-typescript-action@v1
+        with:
+          # TODO: change this on the stable release
+          major-version: 0
+```
 
 ## Specification
 
@@ -133,7 +159,6 @@ This action assumes the following repository layout:
 It creates a new release only if the generated file(s) or action definition is changed.
 
 It ignores any pull request event.
-
 
 ### Inputs
 
