@@ -12,8 +12,11 @@ type Inputs = {
 export const createNextRelease = async (inputs: Inputs) => {
   const majorTag = `v${inputs.majorVersion}`
   core.info(`Major tag is ${majorTag}`)
+
+  await exec.exec('git', ['fetch', '--tags', '--prune-tags', '--prune'])
   const currentTag = await findCurrentTag(majorTag)
   core.info(`Current tag is ${currentTag ?? 'not found'}`)
+
   const nextTag = computeNextTag(currentTag, majorTag, inputs.level)
   core.info(`Next tag is ${nextTag}`)
 
@@ -55,15 +58,13 @@ export const createNextRelease = async (inputs: Inputs) => {
   core.info(`Created a release as ${release.html_url}`)
 }
 
-const findCurrentTag = async (majorTag: string) => {
-  await exec.exec('git', ['fetch', '--tags', '--prune-tags', '--prune'])
+export const findCurrentTag = async (majorTag: string): Promise<string | undefined> => {
   const { stdout } = await exec.getExecOutput('git', ['tag', '--list', '--contains', majorTag], {
     ignoreReturnCode: true,
   })
   return stdout
-    .trim()
     .split(/\n/)
-    .filter((tag) => tag != majorTag)
+    .filter((tag) => tag != '' && tag != majorTag)
     .pop()
 }
 
