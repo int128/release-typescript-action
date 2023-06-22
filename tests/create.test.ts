@@ -1,4 +1,7 @@
-import { isGeneratedFileChanged } from '../src/create'
+import { findCurrentTag, isGeneratedFileChanged } from '../src/create'
+import * as exec from '@actions/exec'
+
+jest.mock('@actions/exec')
 
 describe('generated file is changed in polyrepo', () => {
   test('no diff', () => {
@@ -45,5 +48,27 @@ describe('generated file is changed in monorepo', () => {
   test('nothing to release', () => {
     const diffNames = ['hello/foo']
     expect(isGeneratedFileChanged(diffNames)).toBe(false)
+  })
+})
+
+describe('find the current tag', () => {
+  test('exact tag exists', async () => {
+    jest.mocked(exec.getExecOutput).mockResolvedValue({ stdout: 'v1.0.0', stderr: '', exitCode: 0 })
+    const currentTag = await findCurrentTag('v1')
+    expect(currentTag).toBe('v1.0.0')
+  })
+
+  test('multiple tags exist', async () => {
+    jest.mocked(exec.getExecOutput).mockResolvedValue({ stdout: 'v1.0.0-pre\nv1.0.0', stderr: '', exitCode: 0 })
+    const currentTag = await findCurrentTag('v1')
+    expect(currentTag).toBe('v1.0.0')
+  })
+
+  test('no tag exists', async () => {
+    jest
+      .mocked(exec.getExecOutput)
+      .mockResolvedValue({ stdout: '', stderr: 'error: malformed object name v0', exitCode: 1 })
+    const currentTag = await findCurrentTag('v1')
+    expect(currentTag).toBeUndefined()
   })
 })
