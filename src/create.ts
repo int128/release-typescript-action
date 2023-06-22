@@ -63,9 +63,8 @@ export const findCurrentTag = async (majorTag: string): Promise<string | undefin
     ignoreReturnCode: true,
   })
   return stdout
-    .trim()
     .split(/\n/)
-    .filter((tag) => tag != majorTag)
+    .filter((tag) => tag != '' && tag != majorTag)
     .pop()
 }
 
