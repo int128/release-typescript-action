@@ -54,14 +54,13 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          cache: yarn
-      - run: yarn
-      - run: yarn build
-      - run: yarn package
+          node-version: 20
+      - run: corepack enable pnpm
+      - run: pnpm i
+      - run: pnpm build
       - uses: int128/release-typescript-action@v1
 ```
 
@@ -85,14 +84,14 @@ on:
       - .github/workflows/release.yaml
   schedule:
     # Release a new version every night if there is any change
-    - cron: "0 0 * * *"
+    - cron: '0 0 * * *'
 
 jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
       # (omit...)
-      - run: yarn package
+      - run: pnpm build
       - uses: int128/release-typescript-action@v1
 ```
 
@@ -122,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # (omit...)
-      - run: yarn package
+      - run: pnpm build
       - uses: int128/release-typescript-action@v1
 ```
 
@@ -136,7 +135,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # (omit...)
-      - run: yarn package
+      - run: pnpm build
       - uses: int128/release-typescript-action@v1
         with:
           # TODO: change this on the stable release
@@ -162,10 +161,10 @@ It ignores any pull request event.
 
 ### Inputs
 
-| Name | Default | Description
-|------|----------|------------
-| `major-version` | `1` | Major version to create a tag
-| `increment-level` | `minor` | Either `minor` or `patch`
-| `token` | `github.token` | GitHub token
+| Name              | Default        | Description                   |
+| ----------------- | -------------- | ----------------------------- |
+| `major-version`   | `1`            | Major version to create a tag |
+| `increment-level` | `minor`        | Either `minor` or `patch`     |
+| `token`           | `github.token` | GitHub token                  |
 
 If you want to create a new major release, set `major-version` to 2 or greater.
