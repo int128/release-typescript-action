@@ -1,4 +1,4 @@
-import { findCurrentTag, isGeneratedFileChanged } from '../src/create'
+import { findCurrentTag, isGeneratedFileChanged } from '../src/create.js'
 import * as exec from '@actions/exec'
 
 jest.mock('@actions/exec')
