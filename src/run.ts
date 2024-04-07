@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { createNextRelease } from './create'
-import { followUpCurrentTag } from './update'
+import { createNextRelease } from './create.js'
+import { followUpCurrentTag } from './update.js'
 
 type Inputs = {
   majorVersion: number

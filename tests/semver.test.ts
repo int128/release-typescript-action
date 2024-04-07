@@ -1,4 +1,4 @@
-import { computeNextTag } from '../src/semver'
+import { computeNextTag } from '../src/semver.js'
 
 describe('bump the minor version', () => {
   test('a tag is given', () => {

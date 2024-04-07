@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
-import { Level, computeNextTag } from './semver'
+import { Level, computeNextTag } from './semver.js'
 
 type Inputs = {
   majorVersion: number
