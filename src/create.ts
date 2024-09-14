@@ -21,6 +21,8 @@ export const createNextRelease = async (inputs: Inputs) => {
   core.info(`Next tag is ${nextTag}`)
 
   await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])
+  await exec.exec('rm', ['-fr', '.github/workflows'])
+
   await exec.exec('git', ['add', '.'])
   await exec.exec('git', ['status'])
   await exec.exec('git', ['config', 'user.name', 'github-actions'])
