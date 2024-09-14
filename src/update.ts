@@ -12,6 +12,8 @@ export const followUpCurrentTag = async () => {
   core.info(`Major tag is ${majorTag}`)
 
   await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])
+  await exec.exec('rm', ['-fr', '.github/workflows'])
+
   await exec.exec('git', ['add', '.'])
   if ((await gitStatus()) === '') {
     core.info(`Current tag is up-to-date`)
