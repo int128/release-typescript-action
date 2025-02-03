@@ -102,6 +102,7 @@ It will also update the major tag `v1` to track the latest tag.
 
 You can manually create a new release in GitHub.
 When you push a tag, this action will add a commit with `dist` directory to the tag.
+It will not update the major tag.
 
 ```yaml
 name: release
