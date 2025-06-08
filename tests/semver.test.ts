@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest'
 import { computeNextTag } from '../src/semver.js'
 
 describe('bump the minor version', () => {

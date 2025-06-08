@@ -1,7 +1,8 @@
+import { describe, expect, vi, test } from 'vitest'
 import { findCurrentTag, isGeneratedFileChanged } from '../src/create.js'
 import * as exec from '@actions/exec'
 
-jest.mock('@actions/exec')
+vi.mock('@actions/exec')
 
 describe('isGeneratedFileChanged', () => {
   test('no diff', () => {
@@ -53,21 +54,23 @@ describe('isGeneratedFileChanged for monorepo', () => {
 
 describe('findCurrentTag', () => {
   test('exact tag exists', async () => {
-    jest.mocked(exec.getExecOutput).mockResolvedValue({ stdout: 'v1.0.0', stderr: '', exitCode: 0 })
+    vi.mocked(exec.getExecOutput).mockResolvedValue({ stdout: 'v1.0.0', stderr: '', exitCode: 0 })
     const currentTag = await findCurrentTag('v1')
     expect(currentTag).toBe('v1.0.0')
   })
 
   test('if multiple tags exist, it should return the last one', async () => {
-    jest.mocked(exec.getExecOutput).mockResolvedValue({ stdout: 'v1.0.0-pre\nv1.0.0', stderr: '', exitCode: 0 })
+    vi.mocked(exec.getExecOutput).mockResolvedValue({ stdout: 'v1.0.0-pre\nv1.0.0', stderr: '', exitCode: 0 })
     const currentTag = await findCurrentTag('v1')
     expect(currentTag).toBe('v1.0.0')
   })
 
   test('no tag exists', async () => {
-    jest
-      .mocked(exec.getExecOutput)
-      .mockResolvedValue({ stdout: '', stderr: 'error: malformed object name v0', exitCode: 1 })
+    vi.mocked(exec.getExecOutput).mockResolvedValue({
+      stdout: '',
+      stderr: 'error: malformed object name v0',
+      exitCode: 1,
+    })
     const currentTag = await findCurrentTag('v1')
     expect(currentTag).toBeUndefined()
   })
