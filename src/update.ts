@@ -22,6 +22,7 @@ export const followUpCurrentTag = async () => {
   await exec.exec('git', ['config', 'user.email', 'github-actions@github.com'])
   await exec.exec('git', ['commit', '-m', `Release ${currentTag}`])
   await exec.exec('git', ['tag', '-f', currentTag])
+  await exec.exec('git', ['push', 'origin', '-f', currentTag])
 }
 
 const gitStatus = async (): Promise<string> => {

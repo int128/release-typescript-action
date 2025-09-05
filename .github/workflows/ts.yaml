@@ -17,6 +17,8 @@ on:
       - '*.json'
       - '*.yaml'
       - .github/workflows/ts.yaml
+    tags:
+      - v*
 
 jobs:
   test:
@@ -32,7 +34,7 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
-      - name: e2e-test
+      - name: Run int128/release-typescript-action
         uses: ./
 
   generate:
