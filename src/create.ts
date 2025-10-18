@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
-import { Level, computeNextTag } from './semver.js'
+import { computeNextTag, type Level } from './semver.js'
 
 type Inputs = {
   majorVersion: number
@@ -66,7 +66,7 @@ export const findCurrentTag = async (majorTag: string): Promise<string | undefin
   })
   return stdout
     .split(/\n/)
-    .filter((tag) => tag != '' && tag != majorTag)
+    .filter((tag) => tag !== '' && tag !== majorTag)
     .pop()
 }
 
