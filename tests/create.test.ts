@@ -1,6 +1,6 @@
-import { describe, expect, vi, test } from 'vitest'
-import { findCurrentTag, isGeneratedFileChanged } from '../src/create.js'
 import * as exec from '@actions/exec'
+import { describe, expect, test, vi } from 'vitest'
+import { findCurrentTag, isGeneratedFileChanged } from '../src/create.js'
 
 vi.mock('@actions/exec')
 

@@ -11,9 +11,9 @@ export const computeNextTag = (currentTag: string | undefined, majorTag: string,
   }
   const [, , minor, patch] = currentTagMatcher
   if (level === 'patch') {
-    const patchNumber = parseInt(patch)
+    const patchNumber = parseInt(patch, 10)
     return `${majorTag}.${minor}.${patchNumber + 1}`
   }
-  const minorNumber = parseInt(minor)
+  const minorNumber = parseInt(minor, 10)
   return `${majorTag}.${minorNumber + 1}.0`
 }
