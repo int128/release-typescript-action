@@ -1,9 +1,9 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import * as github from '@actions/github'
+import type { Context } from './github.js'
 
-export const followUpCurrentTag = async () => {
-  const currentTag = github.context.ref.substring('refs/tags/'.length)
+export const followUpCurrentTag = async (context: Context) => {
+  const currentTag = context.ref.substring('refs/tags/'.length)
   core.info(`Current tag is ${currentTag}`)
   if (!currentTag.startsWith('v')) {
     throw Error(`Tag name should start with v but was ${currentTag}`)
