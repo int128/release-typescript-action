@@ -1,15 +1,15 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import * as github from '@actions/github'
+import type { Octokit } from '@octokit/action'
+import type { Context } from './github.js'
 import { computeNextTag, type Level } from './semver.js'
 
 type Inputs = {
   majorVersion: number
   level: Level
-  token: string
 }
 
-export const createNextRelease = async (inputs: Inputs) => {
+export const createNextRelease = async (inputs: Inputs, octokit: Octokit, context: Context) => {
   const majorTag = `v${inputs.majorVersion}`
   core.info(`Major tag is ${majorTag}`)
 
@@ -39,22 +39,24 @@ export const createNextRelease = async (inputs: Inputs) => {
     }
     core.info('Generated file(s) is changed')
   }
-  if (github.context.eventName === 'pull_request') {
+  if (context.eventName === 'pull_request') {
     core.warning(`Next release is ${nextTag} but do nothing on pull request`)
     return
   }
   await exec.exec('git', ['push', 'origin', '-f', nextTag, majorTag])
 
   core.info(`Creating a release for tag ${nextTag}`)
-  const octokit = github.getOctokit(inputs.token)
   const { data: releaseNote } = await octokit.rest.repos.generateReleaseNotes({
-    ...github.context.repo,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     tag_name: nextTag,
     previous_tag_name: currentTag,
   })
   const { data: release } = await octokit.rest.repos.createRelease({
-    ...github.context.repo,
-    ...releaseNote,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    name: releaseNote.name,
+    body: releaseNote.body,
     tag_name: nextTag,
   })
   core.info(`Created a release as ${release.html_url}`)
