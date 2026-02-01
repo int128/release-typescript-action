@@ -32,13 +32,21 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
   await exec.exec('git', ['tag', '-f', majorTag])
 
   if (currentTag !== undefined) {
-    const diffNames = await gitDiff(currentTag, nextTag)
-    if (!isGeneratedFileChanged(diffNames)) {
+    const changedFiles = await getChangedFiles(currentTag, nextTag, [
+      'action.yaml',
+      'action.yml',
+      'dist/**',
+      '*/action.yaml',
+      '*/action.yml',
+      '*/dist/**',
+    ])
+    if (changedFiles.length === 0) {
       core.info('Nothing to release')
       return
     }
     core.info('Generated file(s) is changed')
   }
+
   if (context.eventName === 'pull_request') {
     core.warning(`Next release is ${nextTag} but do nothing on pull request`)
     return
@@ -72,20 +80,7 @@ export const findCurrentTag = async (majorTag: string): Promise<string | undefin
     .pop()
 }
 
-const gitDiff = async (currentTag: string, nextTag: string) => {
-  const { stdout } = await exec.getExecOutput('git', ['diff', '--name-only', currentTag, nextTag, '--'])
-  return stdout.trim().split(/\n/)
-}
-
-export const isGeneratedFileChanged = (diffNames: string[]): boolean => {
-  for (const diffName of diffNames) {
-    const [parent, child] = diffName.split('/')
-    if (parent === 'dist' || parent === 'action.yaml' || parent === 'action.yml') {
-      return true
-    }
-    if (child === 'dist' || child === 'action.yaml' || child === 'action.yml') {
-      return true
-    }
-  }
-  return false
+const getChangedFiles = async (currentTag: string, nextTag: string, patterns: string[]) => {
+  const { stdout } = await exec.getExecOutput('git', ['diff', '--name-only', currentTag, nextTag, '--', ...patterns])
+  return stdout.split(/\n/).filter((filename) => filename !== '')
 }
