@@ -67,6 +67,9 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
     tag_name: nextTag,
   })
   core.info(`Created a release as ${release.html_url}`)
+  return {
+    releaseTag: release.tag_name,
+  }
 }
 
 export const findCurrentTag = async (majorTag: string): Promise<string | undefined> => {
