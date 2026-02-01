@@ -1,23 +1,22 @@
 # release-typescript-action [![ts](https://github.com/int128/release-typescript-action/actions/workflows/ts.yaml/badge.svg)](https://github.com/int128/release-typescript-action/actions/workflows/ts.yaml)
 
-This is an action to automate the release of an action written in TypeScript.
+This is an action for releasing TypeScript-based GitHub Actions.
 
-## Problem to solve
+## Purpose
 
-We need to commit the generated files (e.g. `dist/index.js`) because GitHub Actions runs it on Node.js.
-
+We need to add the generated files (e.g. `dist/index.js`) into a release tag because it runs on Node.js.
 It causes the following problems:
 
-- Release workflow is complex
-- Diff would be large because it contains the generated files
-- Commit history would be growth
+- The release workflow is complex.
+- A commit diff would be large because it contains the generated files.
+- The commit history would grow.
 
-### How to solve
-
-It would be nice to commit the generated files into a release tag only.
+This action solves these problems.
+You don't need to commit the generated files into the main branch anymore.
 
 This action creates a release tag with the generated files.
-For example,
+For example, a release tag (e.g. Tag v1.0.0) contains the generated files,
+but `main` branch (e.g. Commit A, B and C) does not.
 
 ```mermaid
 graph TB
@@ -29,11 +28,9 @@ graph TB
   C --> RC[Tag v1.2.0]
 ```
 
-A release tag (e.g. Tag v1.0.0) contains the generated files, but `main` branch (e.g. Commit A, B and C) does not.
+## Getting started
 
-## Usecases
-
-### Continuous release flow
+### Use-case: Continuous release flow
 
 This workflow continuously creates a new release from `main` branch.
 
@@ -70,7 +67,7 @@ It will also update the major tag `v1` to track the latest tag.
 
 See also https://github.com/int128/typescript-action.
 
-### Daily release flow
+### Use-case: Daily release flow
 
 This workflow everyday creates a new release from `main` branch.
 
@@ -98,7 +95,7 @@ jobs:
 When a schedule is triggered, this action will create a new minor release.
 It will also update the major tag `v1` to track the latest tag.
 
-### Manual release flow
+### Use-case: Manual release flow
 
 You can manually create a new release in GitHub.
 When you push a tag, this action will add a commit with `dist` directory to the tag.
@@ -149,16 +146,15 @@ This action assumes the following repository layout:
 
 - For polyrepo
   - `.gitignore` contains `/dist`
-  - Generated files are under `dist`
-  - Action definition is at `action.yaml` or `action.yml`
+  - The generated files are under `dist`
+  - The action definition is at `action.yaml` or `action.yml`
 - For monorepo
   - `.gitignore` contains `dist/`
-  - Generated files are under `*/dist`
-  - Action definitions are at `*/action.yaml` or `*/action.yml`
+  - The generated files are under `*/dist`
+  - The action definitions are at `*/action.yaml` or `*/action.yml`
 
-It creates a new release only if the generated file(s) or action definition is changed.
-
-It ignores any pull request event.
+This action creates a new release only if the generated files or action definitions are changed.
+It ignores pull_request event.
 
 ### Inputs
 
