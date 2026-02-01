@@ -1,8 +1,10 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import type { Octokit } from '@octokit/action'
+import { commitCurrentChanges, signCurrentCommit } from './commit.js'
 import type { Context } from './github.js'
 
-export const followUpCurrentTag = async (context: Context) => {
+export const followUpCurrentTag = async (octokit: Octokit, context: Context) => {
   const currentTag = context.ref.substring('refs/tags/'.length)
   core.info(`Current tag is ${currentTag}`)
   if (!currentTag.startsWith('v')) {
@@ -18,9 +20,9 @@ export const followUpCurrentTag = async (context: Context) => {
     return
   }
 
-  await exec.exec('git', ['config', 'user.name', 'github-actions'])
-  await exec.exec('git', ['config', 'user.email', 'github-actions@github.com'])
-  await exec.exec('git', ['commit', '-m', `Release ${currentTag}`])
+  await commitCurrentChanges(`Release ${currentTag}`, context)
+  await signCurrentCommit(octokit, context)
+
   await exec.exec('git', ['tag', '-f', currentTag])
   await exec.exec('git', ['push', 'origin', '-f', currentTag])
 }

@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import type { Octokit } from '@octokit/action'
+import { commitCurrentChanges, signCurrentCommit } from './commit.js'
 import type { Context } from './github.js'
 import { computeNextTag, type Level } from './semver.js'
 
@@ -23,11 +24,9 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
   await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])
   await exec.exec('rm', ['-fr', '.github/workflows'])
 
-  await exec.exec('git', ['add', '.'])
-  await exec.exec('git', ['status'])
-  await exec.exec('git', ['config', 'user.name', 'github-actions'])
-  await exec.exec('git', ['config', 'user.email', 'github-actions@github.com'])
-  await exec.exec('git', ['commit', '-m', `Release ${nextTag}`])
+  await commitCurrentChanges(`Release ${nextTag}`, context)
+  await signCurrentCommit(octokit, context)
+
   await exec.exec('git', ['tag', nextTag])
   await exec.exec('git', ['tag', '-f', majorTag])
 
