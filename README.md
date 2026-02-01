@@ -168,3 +168,9 @@ If the default token (i.e. `GITHUB_TOKEN`) is provided, GitHub shows "Verified" 
 | `token`           | `GITHUB_TOKEN` | GitHub token                  |
 
 If you want to create a new major release, set `major-version` to 2 or greater.
+
+### Outputs
+
+| Name          | Description                                      |
+| ------------- | ------------------------------------------------ |
+| `release-tag` | If a release is created, the created release tag |

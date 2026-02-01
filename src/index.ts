@@ -5,7 +5,7 @@ import { run } from './run.js'
 import type { Level } from './semver.js'
 
 const main = async (): Promise<void> => {
-  await run(
+  const outputs = await run(
     {
       majorVersion: Number.parseInt(core.getInput('major-version', { required: true }), 10),
       incrementLevel: parseLevel(core.getInput('increment-level', { required: true })),
@@ -13,6 +13,9 @@ const main = async (): Promise<void> => {
     getOctokit(),
     await getContext(),
   )
+  if (outputs !== undefined) {
+    core.setOutput('release-tag', outputs.releaseTag)
+  }
 }
 
 const parseLevel = (s: string): Level => {
