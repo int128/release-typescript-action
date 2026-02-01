@@ -156,12 +156,15 @@ This action assumes the following repository layout:
 This action creates a new release only if the generated files or action definitions are changed.
 It ignores pull_request event.
 
+This action creates a commit signed by the provided GitHub token.
+If the default token (i.e. `GITHUB_TOKEN`) is provided, GitHub shows "Verified" badge on the commit.
+
 ### Inputs
 
 | Name              | Default        | Description                   |
 | ----------------- | -------------- | ----------------------------- |
 | `major-version`   | `1`            | Major version to create a tag |
 | `increment-level` | `minor`        | Either `minor` or `patch`     |
-| `token`           | `github.token` | GitHub token                  |
+| `token`           | `GITHUB_TOKEN` | GitHub token                  |
 
 If you want to create a new major release, set `major-version` to 2 or greater.
