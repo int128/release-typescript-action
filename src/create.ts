@@ -7,7 +7,7 @@ import { computeNextTag, type Level } from './semver.js'
 
 type Inputs = {
   majorVersion: number
-  level: Level
+  incrementLevel: Level
 }
 
 export const createNextRelease = async (inputs: Inputs, octokit: Octokit, context: Context) => {
@@ -18,7 +18,7 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
   const currentTag = await findCurrentTag(majorTag)
   core.info(`Current tag is ${currentTag ?? 'not found'}`)
 
-  const nextTag = computeNextTag(currentTag, majorTag, inputs.level)
+  const nextTag = computeNextTag(currentTag, majorTag, inputs.incrementLevel)
   core.info(`Next tag is ${nextTag}`)
 
   await exec.exec('sed', ['-i', '-E', 's|^/?dist/?||g', '.gitignore'])
