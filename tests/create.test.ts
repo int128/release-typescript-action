@@ -1,56 +1,8 @@
 import * as exec from '@actions/exec'
 import { describe, expect, test, vi } from 'vitest'
-import { findCurrentTag, isGeneratedFileChanged } from '../src/create.js'
+import { findCurrentTag } from '../src/create.js'
 
 vi.mock('@actions/exec')
-
-describe('isGeneratedFileChanged', () => {
-  test('no diff', () => {
-    expect(isGeneratedFileChanged([])).toBe(false)
-  })
-
-  test('action.yaml is changed', () => {
-    const diffNames = ['action.yaml']
-    expect(isGeneratedFileChanged(diffNames)).toBe(true)
-  })
-
-  test('action.yml is changed', () => {
-    const diffNames = ['action.yml']
-    expect(isGeneratedFileChanged(diffNames)).toBe(true)
-  })
-
-  test('dist is changed', () => {
-    const diffNames = ['dist/index.js']
-    expect(isGeneratedFileChanged(diffNames)).toBe(true)
-  })
-
-  test('nothing to release', () => {
-    const diffNames = ['foo']
-    expect(isGeneratedFileChanged(diffNames)).toBe(false)
-  })
-})
-
-describe('isGeneratedFileChanged for monorepo', () => {
-  test('action.yaml is changed', () => {
-    const diffNames = ['hello/action.yaml']
-    expect(isGeneratedFileChanged(diffNames)).toBe(true)
-  })
-
-  test('action.yml is changed', () => {
-    const diffNames = ['hello/action.yml']
-    expect(isGeneratedFileChanged(diffNames)).toBe(true)
-  })
-
-  test('dist is changed', () => {
-    const diffNames = ['hello/dist/index.js']
-    expect(isGeneratedFileChanged(diffNames)).toBe(true)
-  })
-
-  test('nothing to release', () => {
-    const diffNames = ['hello/foo']
-    expect(isGeneratedFileChanged(diffNames)).toBe(false)
-  })
-})
 
 describe('findCurrentTag', () => {
   test('exact tag exists', async () => {

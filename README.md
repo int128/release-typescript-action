@@ -150,11 +150,11 @@ This action assumes the following repository layout:
 - For polyrepo
   - `.gitignore` contains `/dist`
   - Generated files are under `dist`
-  - Action definition is at `action.yaml`
+  - Action definition is at `action.yaml` or `action.yml`
 - For monorepo
   - `.gitignore` contains `dist/`
   - Generated files are under `*/dist`
-  - Action definitions are at `*/action.yaml`
+  - Action definitions are at `*/action.yaml` or `*/action.yml`
 
 It creates a new release only if the generated file(s) or action definition is changed.
 
