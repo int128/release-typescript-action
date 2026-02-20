@@ -15,6 +15,10 @@ inputs:
     required: true
     default: ${{ github.token }}
 
+outputs:
+  release-tag:
+    description: If a release is created, the created release tag
+
 runs:
   using: 'node20'
   main: 'dist/index.js'
