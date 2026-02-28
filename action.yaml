@@ -1,5 +1,5 @@
 name: release-typescript-action
-description: automate release of typescript-action
+description: Release TypeScript-based GitHub Actions
 
 inputs:
   major-version:
