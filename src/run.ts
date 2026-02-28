@@ -10,10 +10,15 @@ type Inputs = {
   incrementLevel: Level
 }
 
-export const run = async (inputs: Inputs, octokit: Octokit, context: Context): Promise<void> => {
+type Outputs = {
+  releaseTag: string
+}
+
+export const run = async (inputs: Inputs, octokit: Octokit, context: Context): Promise<Outputs | undefined> => {
   if (context.ref.startsWith('refs/tags/')) {
     core.info('Following up the current tag if the generated files are changed')
-    return followUpCurrentTag(octokit, context)
+    followUpCurrentTag(octokit, context)
+    return
   }
   core.info('Preparing the next release')
   return createNextRelease(inputs, octokit, context)
