@@ -3,13 +3,17 @@ description: Release TypeScript-based GitHub Actions
 
 inputs:
   major-version:
-    description: major version
+    description: Major version
     required: true
     default: '1'
   increment-level:
-    description: minor or patch
+    description: Either minor or patch
     required: true
     default: minor
+  dry-run:
+    description: Whether to perform a dry run (no actual release)
+    required: true
+    default: ${{ github.event_name == 'pull_request' }}
   token:
     description: GitHub token
     required: true

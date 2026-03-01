@@ -9,6 +9,7 @@ const main = async (): Promise<void> => {
     {
       majorVersion: Number.parseInt(core.getInput('major-version', { required: true }), 10),
       incrementLevel: parseLevel(core.getInput('increment-level', { required: true })),
+      dryRun: core.getBooleanInput('dry-run', { required: true }),
     },
     getOctokit(),
     await getContext(),
