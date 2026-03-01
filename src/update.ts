@@ -4,9 +4,13 @@ import type { Octokit } from '@octokit/action'
 import { commitCurrentChanges, signCurrentCommit } from './commit.js'
 import type { Context } from './github.js'
 
-export const followUpCurrentTag = async (octokit: Octokit, context: Context) => {
+type Inputs = {
+  dryRun: boolean
+}
+
+export const followUpCurrentTag = async (inputs: Inputs, octokit: Octokit, context: Context) => {
   const currentTag = context.ref.substring('refs/tags/'.length)
-  core.info(`Current tag is ${currentTag}`)
+  core.info(`The current tag is ${currentTag}`)
   if (!currentTag.startsWith('v')) {
     throw Error(`Tag name should start with v but was ${currentTag}`)
   }
@@ -16,7 +20,7 @@ export const followUpCurrentTag = async (octokit: Octokit, context: Context) => 
 
   await exec.exec('git', ['add', '.'])
   if ((await gitStatus()) === '') {
-    core.info(`Current tag is up-to-date`)
+    core.info(`The current tag ${currentTag} is up-to-date`)
     return
   }
 
@@ -24,6 +28,11 @@ export const followUpCurrentTag = async (octokit: Octokit, context: Context) => 
   await signCurrentCommit(octokit, context)
 
   await exec.exec('git', ['tag', '-f', currentTag])
+
+  if (inputs.dryRun) {
+    core.warning(`[dry-run] Updating the current tag ${currentTag}`)
+    return
+  }
   await exec.exec('git', ['push', 'origin', '-f', currentTag])
 }
 

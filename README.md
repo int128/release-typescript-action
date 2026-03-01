@@ -81,7 +81,7 @@ on:
       - .github/workflows/release.yaml
   schedule:
     # Release a new version every night if there is any change
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   tag:
@@ -153,18 +153,24 @@ This action assumes the following repository layout:
   - The generated files are under `*/dist`
   - The action definitions are at `*/action.yaml` or `*/action.yml`
 
-This action creates a new release only if the generated files or action definitions are changed.
-It ignores pull_request event.
+This action performs the following steps:
+
+- For `pull_request` events (i.e., `dry-run` input is true), it just shows the next release version.
+- For `push` events with a tag, it updates the tag with the generated files.
+- For other events,
+  - If the generated files are changed, it creates a new release with the generated files and updates the major tag (e.g. `v1`).
+  - If the generated files are not changed, it does nothing.
 
 This action creates a commit signed by the provided GitHub token.
-If the default token (i.e. `GITHUB_TOKEN`) is provided, GitHub shows "Verified" badge on the commit.
+If the default token (i.e., `GITHUB_TOKEN`) is provided, GitHub shows "Verified" badge on the commit.
 
 ### Inputs
 
-| Name              | Default        | Description                   |
-| ----------------- | -------------- | ----------------------------- |
-| `major-version`   | `1`            | Major version to create a tag |
-| `increment-level` | `minor`        | Either `minor` or `patch`     |
-| `token`           | `GITHUB_TOKEN` | GitHub token                  |
+| Name              | Default                               | Description                                      |
+| ----------------- | ------------------------------------- | ------------------------------------------------ |
+| `major-version`   | `1`                                   | Major version to create a tag                    |
+| `increment-level` | `minor`                               | Either `minor` or `patch`                        |
+| `dry-run`         | `github.event_name == 'pull_request'` | Whether to perform a dry run (no actual release) |
+| `token`           | `GITHUB_TOKEN`                        | GitHub token                                     |
 
 If you want to create a new major release, set `major-version` to 2 or greater.
