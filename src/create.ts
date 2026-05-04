@@ -12,10 +12,12 @@ type Inputs = {
 }
 
 export const createNextRelease = async (inputs: Inputs, octokit: Octokit, context: Context) => {
+  core.startGroup(`Fetching the tags from the remote repository`)
+  await exec.exec('git', ['fetch', '--tags', '--prune-tags', '--prune'])
+  core.endGroup()
+
   const majorTag = `v${inputs.majorVersion}`
   core.info(`The major tag is ${majorTag}`)
-
-  await exec.exec('git', ['fetch', '--tags', '--prune-tags', '--prune'])
   const currentTag = await findCurrentTag(majorTag)
   core.info(`The current tag is ${currentTag ?? 'not found'}`)
 
