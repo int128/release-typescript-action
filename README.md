@@ -61,9 +61,9 @@ jobs:
       - uses: int128/release-typescript-action@v1
 ```
 
-When you merge a pull request into `main` branch, this action will create a new release of new minor version.
-For example, if the latest tag `v1.5.0` exists, this action will create a tag `v1.6.0`.
-It will also update the major tag `v1` to track the latest tag.
+When you merge a pull request into `main` branch, this action will create a new release.
+For example, if the latest tag `v1.5.0` exists, this action will create a tag `v1.6.0` and update the major tag `v1` to track the latest tag.
+If no tag exists, it will create a tag `v1.0.0` and the major tag `v1`.
 
 See also https://github.com/int128/typescript-action.
 
@@ -92,8 +92,9 @@ jobs:
       - uses: int128/release-typescript-action@v1
 ```
 
-When a schedule is triggered, this action will create a new minor release.
-It will also update the major tag `v1` to track the latest tag.
+When a schedule is triggered, this action will create a new release.
+For example, if the latest tag `v1.5.0` exists, this action will create a tag `v1.6.0` and update the major tag `v1` to track the latest tag.
+If no tag exists, it will create a tag `v1.0.0` and the major tag `v1`.
 
 ### Use-case: Manual release flow
 
@@ -153,7 +154,14 @@ This action assumes the following repository layout:
   - The generated files are under `*/dist`
   - The action definitions are at `*/action.yaml` or `*/action.yml`
 
-This action performs the following steps:
+It assumes that the major tag (e.g. `v1`) points to the latest version tag (e.g. `v1.5.0`) as follows:
+
+- If the major tag does not exist, it creates a first version tag (e.g. `v1.0.0`) and the major tag (e.g. `v1`).
+- If the major tag points to a version tag, it creates the next version tag (e.g. `v1.6.0`) and updates the major tag (e.g. `v1`) to point to the next version tag.
+- If the major tag points to a non-version tag, it throws an error.
+- If the major tag points to multiple version tags, it throws an error.
+
+It performs the following steps:
 
 - For `pull_request` events (i.e., `dry-run` input is true), it just shows the next release version.
 - For `push` events with a tag, it updates the tag with the generated files.
