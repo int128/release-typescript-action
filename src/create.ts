@@ -46,23 +46,27 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
     core.info('The generated file(s) is changed')
   }
 
-  if (inputs.dryRun) {
-    core.warning(`[dry-run] Creating the next tag ${nextTag}`)
-    return
-  }
-  await exec.exec('git', ['push', 'origin', nextTag])
-
   // Update the major tag if the next tag has been successfully created.
+  const pushFlags = inputs.dryRun ? ['--dry-run'] : []
+  await exec.exec('git', ['push', ...pushFlags, 'origin', nextTag])
   await exec.exec('git', ['tag', '-f', majorTag])
-  await exec.exec('git', ['push', 'origin', '-f', majorTag])
+  await exec.exec('git', ['push', '-f', ...pushFlags, 'origin', majorTag])
 
-  core.info(`Creating a release for the tag ${nextTag}`)
   const { data: releaseNote } = await octokit.rest.repos.generateReleaseNotes({
     owner: context.repo.owner,
     repo: context.repo.repo,
     tag_name: nextTag,
     previous_tag_name: currentTag,
   })
+  core.startGroup(`Release note for ${releaseNote.name}`)
+  core.info(releaseNote.body)
+  core.endGroup()
+
+  if (inputs.dryRun) {
+    core.warning(`[dry-run] Creating the next release ${nextTag}`)
+    return
+  }
+  core.info(`Creating the next release ${nextTag}`)
   const { data: release } = await octokit.rest.repos.createRelease({
     owner: context.repo.owner,
     repo: context.repo.repo,
