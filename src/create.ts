@@ -74,13 +74,23 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
 }
 
 export const findCurrentTag = async (majorTag: string): Promise<string | undefined> => {
-  const { stdout } = await exec.getExecOutput('git', ['tag', '--list', '--contains', majorTag], {
+  const revParseCode = await exec.exec('git', ['rev-parse', '--verify', `refs/tags/${majorTag}`], {
     ignoreReturnCode: true,
   })
-  return stdout
-    .split(/\n/)
-    .filter((tag) => tag !== '' && tag !== majorTag)
-    .pop()
+  if (revParseCode !== 0) {
+    core.info(`The major tag ${majorTag} does not exist`)
+    return
+  }
+
+  const { stdout } = await exec.getExecOutput('git', ['tag', '--list', '--contains', majorTag])
+  const currentTags = stdout.split(/\n/).filter((tag) => tag !== '' && tag !== majorTag)
+  if (currentTags.length === 0) {
+    throw new Error(`The major tag ${majorTag} does not point to any version tag`)
+  }
+  if (currentTags.length > 1) {
+    throw new Error(`The major tag ${majorTag} points to multiple version tags: ${currentTags.join(', ')}`)
+  }
+  return currentTags[0]
 }
 
 const getChangedFiles = async (currentTag: string, nextTag: string, patterns: string[]) => {
