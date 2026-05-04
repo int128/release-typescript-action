@@ -82,7 +82,7 @@ export const findCurrentTag = async (majorTag: string): Promise<string | undefin
     return
   }
 
-  const { stdout } = await exec.getExecOutput('git', ['tag', '--list', '--contains', majorTag])
+  const { stdout } = await exec.getExecOutput('git', ['tag', '--list', '--contains', `refs/tags/${majorTag}`])
   const currentTags = stdout.split(/\n/).filter((tag) => tag !== '' && tag !== majorTag)
   if (currentTags.length === 0) {
     throw new Error(`The major tag ${majorTag} does not point to any version tag`)
