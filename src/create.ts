@@ -29,7 +29,6 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
   await signCurrentCommit(octokit, context)
 
   await exec.exec('git', ['tag', nextTag])
-  await exec.exec('git', ['tag', '-f', majorTag])
 
   if (currentTag !== undefined) {
     const changedFiles = await getChangedFiles(currentTag, nextTag, [
@@ -48,10 +47,15 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
   }
 
   if (inputs.dryRun) {
-    core.warning(`[dry-run] Creating the next release ${nextTag}`)
+    core.warning(`[dry-run] Creating the next tag ${nextTag}`)
     return
   }
-  await exec.exec('git', ['push', 'origin', '-f', nextTag, majorTag])
+  await exec.exec('git', ['push', 'origin', nextTag])
+
+  // Update the major tag if the next tag has been successfully created.
+  await exec.exec('git', ['tag', '-f', majorTag])
+  await exec.exec('git', ['push', 'origin', '-f', majorTag])
+
   core.info(`Creating a release for the tag ${nextTag}`)
   const { data: releaseNote } = await octokit.rest.repos.generateReleaseNotes({
     owner: context.repo.owner,
