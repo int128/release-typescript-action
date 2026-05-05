@@ -60,8 +60,14 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
     tag_name: nextTag,
     previous_tag_name: currentTag,
   })
+  // https://github.com/orgs/community/discussions/63414
+  let releaseNodeBody = releaseNote.body
+  if (releaseNodeBody.length > 100000) {
+    core.warning('The release note is too long. Truncating to 100,000 characters.')
+    releaseNodeBody = releaseNodeBody.slice(0, 100000)
+  }
   core.startGroup(`Release note for ${releaseNote.name}`)
-  core.info(releaseNote.body)
+  core.info(releaseNodeBody)
   core.endGroup()
 
   if (inputs.dryRun) {
@@ -73,7 +79,7 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
     owner: context.repo.owner,
     repo: context.repo.repo,
     name: releaseNote.name,
-    body: releaseNote.body,
+    body: releaseNodeBody,
     tag_name: nextTag,
   })
   core.info(`Created a release as ${release.html_url}`)
