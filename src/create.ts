@@ -28,8 +28,7 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
   await exec.exec('rm', ['-fr', '.github/workflows'])
 
   await commitCurrentChanges(`Release ${nextTag}`, context)
-  await signCurrentCommit(octokit, context)
-
+  const releaseCommitSHA = await signCurrentCommit(octokit, context)
   await exec.exec('git', ['tag', nextTag])
 
   if (currentTag !== undefined) {
@@ -54,20 +53,9 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
   await exec.exec('git', ['tag', '-f', majorTag])
   await exec.exec('git', ['push', '-f', ...pushFlags, 'origin', majorTag])
 
-  const { data: releaseNote } = await octokit.rest.repos.generateReleaseNotes({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    tag_name: nextTag,
-    previous_tag_name: currentTag,
-  })
-  // https://github.com/orgs/community/discussions/63414
-  let releaseNodeBody = releaseNote.body
-  if (releaseNodeBody.length > 100000) {
-    core.warning('The release note is too long. Truncating to 100,000 characters.')
-    releaseNodeBody = releaseNodeBody.slice(0, 100000)
-  }
-  core.startGroup(`Release note for ${releaseNote.name}`)
-  core.info(releaseNodeBody)
+  const releaseNote = await generateReleaseNote(releaseCommitSHA, currentTag, nextTag, octokit, context)
+  core.startGroup(`Release note for ${nextTag}`)
+  core.info(releaseNote)
   core.endGroup()
 
   if (inputs.dryRun) {
@@ -78,11 +66,39 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
   const { data: release } = await octokit.rest.repos.createRelease({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    name: releaseNote.name,
-    body: releaseNodeBody,
+    name: nextTag,
+    body: releaseNote,
     tag_name: nextTag,
   })
   core.info(`Created a release as ${release.html_url}`)
+}
+
+const generateReleaseNote = async (
+  releaseCommitSHA: string,
+  currentTag: string | undefined,
+  nextTag: string,
+  octokit: Octokit,
+  context: Context,
+) => {
+  const { data: generatedReleaseNote } = await octokit.rest.repos.generateReleaseNotes({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    tag_name: nextTag,
+    previous_tag_name: currentTag,
+  })
+  const body = `\
+\`\`\`yaml
+uses: ${context.repo.owner}/${context.repo.repo}@${releaseCommitSHA} # ${nextTag}
+\`\`\`
+
+${generatedReleaseNote.body}`
+
+  // https://github.com/orgs/community/discussions/63414
+  if (body.length > 100000) {
+    core.warning('The generated release note is too long. Truncating to 100,000 characters.')
+    return `${body.slice(0, 100000)}...(truncated)`
+  }
+  return body
 }
 
 export const findCurrentTag = async (majorTag: string): Promise<string | undefined> => {

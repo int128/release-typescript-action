@@ -16,7 +16,7 @@ export const commitCurrentChanges = async (message: string, context: Context) =>
   ])
 }
 
-export const signCurrentCommit = async (octokit: Octokit, context: Context) => {
+export const signCurrentCommit = async (octokit: Octokit, context: Context): Promise<string> => {
   const unsignedCommitSHA = await getCurrentSHA()
   const signingBranch = `signing--${unsignedCommitSHA}`
   await exec.exec('git', ['push', 'origin', `${unsignedCommitSHA}:refs/heads/${signingBranch}`])
@@ -42,6 +42,7 @@ export const signCurrentCommit = async (octokit: Octokit, context: Context) => {
     })
     await exec.exec('git', ['fetch', 'origin', '--depth=1', signedCommit.sha])
     await exec.exec('git', ['checkout', signedCommit.sha])
+    return signedCommit.sha
   } finally {
     await exec.exec('git', ['push', 'origin', '--delete', `refs/heads/${signingBranch}`])
   }
