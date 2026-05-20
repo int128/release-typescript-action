@@ -53,9 +53,9 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
   await exec.exec('git', ['tag', '-f', majorTag])
   await exec.exec('git', ['push', '-f', ...pushFlags, 'origin', majorTag])
 
-  const releaseNote = await generateReleaseNote(releaseCommitSHA, currentTag, nextTag, octokit, context)
+  const releaseBody = await generateReleaseBody(releaseCommitSHA, currentTag, nextTag, octokit, context)
   core.startGroup(`Release note for ${nextTag}`)
-  core.info(releaseNote)
+  core.info(releaseBody)
   core.endGroup()
 
   if (inputs.dryRun) {
@@ -67,13 +67,13 @@ export const createNextRelease = async (inputs: Inputs, octokit: Octokit, contex
     owner: context.repo.owner,
     repo: context.repo.repo,
     name: nextTag,
-    body: releaseNote,
+    body: releaseBody,
     tag_name: nextTag,
   })
   core.info(`Created a release as ${release.html_url}`)
 }
 
-const generateReleaseNote = async (
+const generateReleaseBody = async (
   releaseCommitSHA: string,
   currentTag: string | undefined,
   nextTag: string,
@@ -94,9 +94,10 @@ uses: ${context.repo.owner}/${context.repo.repo}@${releaseCommitSHA} # ${nextTag
 ${generatedReleaseNote.body}`
 
   // https://github.com/orgs/community/discussions/63414
-  if (body.length > 100000) {
-    core.warning('The generated release note is too long. Truncating to 100,000 characters.')
-    return `${body.slice(0, 100000)}...(truncated)`
+  const maxReleaseBodyLength = 100000
+  if (body.length > maxReleaseBodyLength) {
+    core.warning(`The generated release note is too long. Truncating to ${maxReleaseBodyLength} characters.`)
+    return `${body.slice(0, maxReleaseBodyLength)}...(truncated)`
   }
   return body
 }
